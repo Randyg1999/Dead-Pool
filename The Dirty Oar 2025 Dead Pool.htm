@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The Dirty Oar 2025 Dead Pool</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Styles -->
+<style>
+    /* Global Styles */
+    body {
+        background-color: powderblue;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    /* Typography */
+    h1, h2 {
+        text-align: center;
+        color: black;
+    }
+
+    h1 {
+        font-family: "Cooper Black", serif;
+        text-shadow: 0 0 3px #FF0000;
+		color: gray;
+    }
+
+    /* Table Styles */
+    table {
+        width: 90%;
+        margin: 10px auto;
+        border-collapse: collapse;
+        background-color: lightgrey;
+    }
+
+    th, td {
+        border: 1px solid black;
+        padding: 5px;
+        text-align: left;
+        color: #666699;
+        font-weight: bold;
+        font-size: 20px;
+    }
+	
+	/* Center the 'Round', 'Potential Points', and 'Final Points' columns */
+	th.round, td.round,
+	th.potential-points, td.potential-points,
+	th.final-points, td.final-points {
+		text-align: center;
+	}
+
+
+    /* Center text in specific cells */
+    .center-text,
+    #summaryTable th,
+    #summaryTable td {
+        text-align: center;
+    }
+
+    /* Hover Effects for Rows */
+    #personTable tr,
+    #graveyardTable tr {
+        border: 1px solid black;
+        transition: border 0.3s;
+    }
+
+    #personTable tr:hover,
+    #graveyardTable tr:hover {
+        border: 2px solid black;
+    }
+
+    /* Hover Effects for Headers */
+    #personTable th,
+    #graveyardTable th {
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    #personTable th:hover,
+    #graveyardTable th:hover {
+        background-color: #ddd;
+    }
+
+    /* Link Styles */
+    #personTable a,
+    #graveyardTable a {
+        color: #666699;
+        text-decoration: none;
+    }
+
+    #personTable a:hover,
+    #graveyardTable a:hover {
+        text-decoration: underline;
+    }
+
+    /* Graveyard Styles */
+    .graveyard-title,
+    .graveyard-table {
+        font-family: 'Courier New', monospace;
+    }
+
+    /* Table Container */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Responsive Design */
+    @media screen and (max-width: 600px) {
+        th, td {
+            font-size: 14px;
+            padding: 5px;
+        }
+    }
+
+    /* Loading Overlay */
+    #loadingOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    #loadingPopup {
+        text-align: center;
+    }
+
+    #loadingText {
+        font-family: 'Courier New', monospace;
+        font-size: 24px;
+        color: #00ff00;
+        text-shadow: 0 0 5px #00ff00;
+        margin-bottom: 20px;
+    }
+
+    #progressBar {
+        width: 200px;
+        height: 20px;
+        background-color: #333;
+        border: 2px solid #00ff00;
+        margin: 0 auto;
+    }
+
+    #progressFill {
+        width: 0%;
+        height: 100%;
+        background-color: #00ff00;
+        transition: width 0.5s;
+    }
+
+    @keyframes blink {
+        0% { opacity: 0; }
+        50% { opacity: 1; }
+        100% { opacity: 0; }
+    }
+
+    .blink {
+        animation: blink 1s infinite;
+    }
+
+    /* Player Colors */
+    .Randy {
+        background-color: #a0ced9;
+    }
+
+    .Brett {
+        background-color: #adf7b6;
+    }
+
+    .Julie {
+        background-color: #ffee93;
+    }
+
+    .Becky {
+        background-color: #ffcf81;
+    }
+
+    .Amanda {
+        background-color: #cdb7dc;
+    }
+
+    .Michael {
+        background-color: pink;
+    }
+
+    .Shaun {
+        background-color: lightgrey;
+    }
+
+    /* Highlight Winning Row */
+    .winner {
+        font-weight: bold;
+        border: 3px solid #ff686b;
+        color: #ff686b;
+    }
+
+    /* Table Row Hover Effects */
+    tr:hover {
+        background-color: #f1f1f1;
+    }
+</style>
+
+</head>
+<body>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay">
+        <div id="loadingPopup">
+            <div id="loadingText">LOADING<span class="blink">...</span></div>
+            <div id="progressBar">
+                <div id="progressFill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <header>
+        <h1>The Dirty Oar 2025 Dead Pool</h1>
+    </header>
+
+    <main>
+        <!-- Player Standings -->
+        <section>
+            <h2>Player Standings</h2>
+            <div class="table-container">
+                <table id="summaryTable">
+                    <thead>
+                        <tr>
+                            <th>Player Name</th>
+                            <th>First Death</th>
+                            <th>Last Death</th>
+                            <th>Highest Body Count</th>
+                            <th>Most Unique Entry</th>
+                            <th>Age & Round Points</th>
+                            <th>Total Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Player rows will be generated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Graveyard -->
+        <section>
+            <h2>👻 The Graveyard 👻</h2>
+            <div class="table-container">
+                <table id="graveyardTable">
+                    <thead>
+                        <tr>
+                            <th>Player Name</th>
+                            <th class="round">Round</th>
+                            <th>Celebrity Name</th>
+                            <th>Birthday</th>
+                            <th>Date of Death</th>
+                            <th class="final-points">Final Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Graveyard rows will be generated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Contestant List -->
+        <section>
+            <h2>Contestant List</h2>
+            <div class="table-container">
+                <table id="personTable">
+                    <thead>
+                        <tr>
+                            <th data-column="playerName">Player Name</th>
+                            <th data-column="round" class="round">Round</th>
+                            <th data-column="name">Celebrity Name</th>
+                            <th data-column="birthday">Birthday</th>
+                            <th data-column="dateOfDeath">Date of Death</th>
+                            <th data-column="potentialPoints" class="potential-points">Potential Points</th>
+                            <th data-column="finalPoints" class="final-points">Final Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Contestant rows will be generated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Scripts -->
+    <script>
+        (function() {
+            'use strict';
+
+			// Cache TTL and Connection Check Functions
+			const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
+			function getCachedData() {
+				const cachedData = JSON.parse(localStorage.getItem('wikidataCache'));
+				const cachedTime = localStorage.getItem('cacheTime');
+				if (cachedData && cachedTime && (Date.now() - cachedTime) < CACHE_TTL) {
+					return cachedData;
+				}
+				return null;
+			}
+
+			function setCachedData(data) {
+				localStorage.setItem('wikidataCache', JSON.stringify(data));
+				localStorage.setItem('cacheTime', Date.now());
+			}
+
+			function checkConnection() {
+				return window.navigator.onLine;
+			}
+			
+			function displayCachedData() {
+				const cachedData = getCachedData();
+				if (cachedData) {
+					const lastUpdateTime = new Date(parseInt(localStorage.getItem('cacheTime'), 10));
+					processAllData(cachedData);
+					alert(`Displaying last known data from ${lastUpdateTime.toLocaleString()}.`);
+				} else {
+					alert('No cached data available.');
+				}
+			}
+
+			async function fetchData() {
+				if (checkConnection()) {
+					try {
+						console.log('Fetching fresh data');
+						const freshData = await fetchAllData(); // Your existing fetch function
+						setCachedData(freshData); // Store fetched data in cache
+						processAllData(freshData); // Process and display data
+					} catch (error) {
+						console.log('Error fetching data. Using cached data');
+						displayCachedData(); // Fallback to cached data if API fails
+					}
+				} else {
+					console.log('No internet connection. Using cached data');
+					displayCachedData();
+					alert('No internet connection detected. Showing last known data.');
+				}
+			}
+
+            // Player Data
+            const players = [
+                // All contestants listed by QID and player name - 25 per player
+                // Edit the picks, the Start and End dates and the player colors in CSS
+            { playerName: 'Randy', qid: 'Q23685', round: 1 },
+        	{ playerName: 'Randy', qid: 'Q310295', round: 2 },
+			{ playerName: 'Randy', qid: 'Q11975', round: 3 },
+			{ playerName: 'Randy', qid: 'Q211082', round: 4 },
+			{ playerName: 'Randy', qid: 'Q34086', round: 5 },
+			{ playerName: 'Randy', qid: 'Q43203', round: 6 },
+			{ playerName: 'Randy', qid: 'Q718078', round: 7 },
+			{ playerName: 'Randy', qid: 'Q194045', round: 8 },
+			{ playerName: 'Randy', qid: 'Q117012', round: 9 },
+			{ playerName: 'Randy', qid: 'Q2808', round: 10 },
+			{ playerName: 'Randy', qid: 'Q218718', round: 11 },
+			{ playerName: 'Randy', qid: 'Q183337', round: 12 },
+			{ playerName: 'Randy', qid: 'Q180589', round: 13 },
+			{ playerName: 'Randy', qid: 'Q21621919', round: 14 },
+			{ playerName: 'Randy', qid: 'Q36268', round: 15 },
+			{ playerName: 'Randy', qid: 'Q310394', round: 16 },
+			{ playerName: 'Randy', qid: 'Q22686', round: 17 },
+			{ playerName: 'Randy', qid: 'Q193368', round: 18 },
+			{ playerName: 'Randy', qid: 'Q9671', round: 19 },
+			{ playerName: 'Randy', qid: 'Q41173', round: 20 },
+			{ playerName: 'Randy', qid: 'Q6275683', round: 21 },
+			{ playerName: 'Randy', qid: 'Q165219', round: 22 },
+			{ playerName: 'Randy', qid: 'Q271348', round: 23 },
+			{ playerName: 'Randy', qid: 'Q319121', round: 24 },
+			{ playerName: 'Randy', qid: 'Q117970', round: 25 },
+			{ playerName: 'Julie', qid: 'Q133151', round: 1 },
+			{ playerName: 'Julie', qid: 'Q36949', round: 2 },
+			{ playerName: 'Julie', qid: 'Q44903', round: 3 },
+			{ playerName: 'Julie', qid: 'Q561852', round: 4 },
+			{ playerName: 'Julie', qid: 'Q48337', round: 5 },
+			{ playerName: 'Julie', qid: 'Q83287', round: 6 },
+			{ playerName: 'Julie', qid: 'Q297173', round: 7 },
+			{ playerName: 'Julie', qid: 'Q450675', round: 8 },
+			{ playerName: 'Julie', qid: 'Q44546', round: 9 },
+			{ playerName: 'Julie', qid: 'Q37175', round: 10 },
+			{ playerName: 'Julie', qid: 'Q705419', round: 11 },
+			{ playerName: 'Julie', qid: 'Q190631', round: 12 },
+			{ playerName: 'Julie', qid: 'Q103578', round: 13 },
+			{ playerName: 'Julie', qid: 'Q498019', round: 14 },
+			{ playerName: 'Julie', qid: 'Q888295', round: 15 },
+			{ playerName: 'Julie', qid: 'Q6184378', round: 16 },
+			{ playerName: 'Julie', qid: 'Q919527', round: 17 },
+			{ playerName: 'Julie', qid: 'Q2252', round: 18 },
+			{ playerName: 'Julie', qid: 'Q238862', round: 19 },
+			{ playerName: 'Julie', qid: 'Q355130', round: 20 },
+			{ playerName: 'Julie', qid: 'Q294531', round: 21 },
+			{ playerName: 'Julie', qid: 'Q49075', round: 22 },
+			{ playerName: 'Julie', qid: 'Q344977', round: 23 },
+			{ playerName: 'Julie', qid: 'Q311672', round: 24 },
+			{ playerName: 'Julie', qid: 'Q43874', round: 25 },
+			{ playerName: 'Sally', qid: 'Q312514', round: 1 },
+			{ playerName: 'Sally', qid: 'Q18097962', round: 2 },
+			{ playerName: 'Sally', qid: 'Q212648', round: 3 },
+			{ playerName: 'Sally', qid: 'Q188280', round: 4 },
+			{ playerName: 'Sally', qid: 'Q1329372', round: 5 },
+			{ playerName: 'Sally', qid: 'Q127819', round: 6 },
+			{ playerName: 'Sally', qid: 'Q44473', round: 7 },
+			{ playerName: 'Sally', qid: 'Q43723', round: 8 },
+			{ playerName: 'Sally', qid: 'Q888132', round: 9 },
+			{ playerName: 'Sally', qid: 'Q310275', round: 10 },
+			{ playerName: 'Sally', qid: 'Q5556756', round: 11 },
+			{ playerName: 'Sally', qid: 'Q213512', round: 12 },
+			{ playerName: 'Sally', qid: 'Q7137312', round: 13 },
+			{ playerName: 'Sally', qid: 'Q205721', round: 14 },
+			{ playerName: 'Sally', qid: 'Q347879', round: 15 },
+			{ playerName: 'Sally', qid: 'Q310926', round: 16 },
+			{ playerName: 'Sally', qid: 'Q316647', round: 17 },
+			{ playerName: 'Sally', qid: 'Q941013', round: 18 },
+			{ playerName: 'Sally', qid: 'Q11142', round: 19 },
+			{ playerName: 'Sally', qid: 'Q1614313', round: 20 },
+			{ playerName: 'Sally', qid: 'Q52392', round: 21 },
+			{ playerName: 'Sally', qid: 'Q187033', round: 22 },
+			{ playerName: 'Sally', qid: 'Q633263', round: 23 },
+			{ playerName: 'Sally', qid: 'Q6279', round: 24 },
+			{ playerName: 'Sally', qid: 'Q298838', round: 25 },
+			{ playerName: 'Jared', qid: 'Q503013', round: 1 },
+			{ playerName: 'Jared', qid: 'Q531599', round: 2 },
+			{ playerName: 'Jared', qid: 'Q3874799', round: 3 },
+			{ playerName: 'Jared', qid: 'Q179051', round: 4 },
+			{ playerName: 'Jared', qid: 'Q207598', round: 5 },
+			{ playerName: 'Jared', qid: 'Q465130', round: 6 },
+			{ playerName: 'Jared', qid: 'Q14441', round: 7 },
+			{ playerName: 'Jared', qid: 'Q16297', round: 8 },
+			{ playerName: 'Jared', qid: 'Q83688347', round: 9 },
+			{ playerName: 'Jared', qid: 'Q321280', round: 10 },
+			{ playerName: 'Jared', qid: 'Q39792', round: 11 },
+			{ playerName: 'Jared', qid: 'Q1744', round: 12 },
+			{ playerName: 'Jared', qid: 'Q53944', round: 13 },
+			{ playerName: 'Jared', qid: 'Q57336', round: 14 },
+			{ playerName: 'Jared', qid: 'Q1378213', round: 15 },
+			{ playerName: 'Jared', qid: 'Q310493', round: 16 },
+			{ playerName: 'Jared', qid: 'Q4355654', round: 17 },
+			{ playerName: 'Jared', qid: 'Q6513335', round: 18 },
+			{ playerName: 'Jared', qid: 'Q56226', round: 19 },
+			{ playerName: 'Jared', qid: 'Q12908', round: 20 },
+			{ playerName: 'Jared', qid: 'Q238402', round: 21 },
+			{ playerName: 'Jared', qid: 'Q312081', round: 22 },
+			{ playerName: 'Jared', qid: 'Q193635', round: 23 },
+			{ playerName: 'Jared', qid: 'Q432437', round: 24 },
+			{ playerName: 'Jared', qid: 'Q155412', round: 25 },
+			{ playerName: 'Michael', qid: 'Q355522', round: 1 },
+			{ playerName: 'Michael', qid: 'Q2680', round: 2 },
+			{ playerName: 'Michael', qid: 'Q395274', round: 3 },
+			{ playerName: 'Michael', qid: 'Q5105', round: 4 },
+			{ playerName: 'Michael', qid: 'Q103939', round: 5 },
+			{ playerName: 'Michael', qid: 'Q618233', round: 6 },
+			{ playerName: 'Michael', qid: 'Q203960', round: 7 },
+			{ playerName: 'Michael', qid: 'Q95693632', round: 8 },
+			{ playerName: 'Michael', qid: 'Q41163', round: 9 },
+			{ playerName: 'Michael', qid: 'Q119798', round: 10 },
+			{ playerName: 'Michael', qid: 'Q172653', round: 11 },
+			{ playerName: 'Michael', qid: 'Q103784', round: 12 },
+			{ playerName: 'Michael', qid: 'Q59215', round: 13 },
+			{ playerName: 'Michael', qid: 'Q161819', round: 14 },
+			{ playerName: 'Michael', qid: 'Q1124', round: 15 },
+			{ playerName: 'Michael', qid: 'Q16296', round: 16 },
+			{ playerName: 'Michael', qid: 'Q170510', round: 17 },
+			{ playerName: 'Michael', qid: 'Q182655', round: 18 },
+			{ playerName: 'Michael', qid: 'Q128121', round: 19 },
+			{ playerName: 'Michael', qid: 'Q714', round: 20 },
+			{ playerName: 'Michael', qid: 'Q295847', round: 21 },
+			{ playerName: 'Michael', qid: 'Q40504', round: 22 },
+			{ playerName: 'Michael', qid: 'Q465632', round: 23 },
+			{ playerName: 'Michael', qid: 'Q217298', round: 24 },
+			{ playerName: 'Michael', qid: 'Q131285', round: 25 },
+			{ playerName: 'Brett', qid: 'Q15615', round: 1 },
+			{ playerName: 'Brett', qid: 'Q65932', round: 2 },
+			{ playerName: 'Brett', qid: 'Q7747', round: 3 },
+			{ playerName: 'Brett', qid: 'Q12003', round: 4 },
+			{ playerName: 'Brett', qid: 'Q170581', round: 5 },
+			{ playerName: 'Brett', qid: 'Q559819', round: 6 },
+			{ playerName: 'Brett', qid: 'Q1190974', round: 7 },
+			{ playerName: 'Brett', qid: 'Q181678', round: 8 },
+			{ playerName: 'Brett', qid: 'Q180453', round: 9 },
+			{ playerName: 'Brett', qid: 'Q467519', round: 10 },
+			{ playerName: 'Brett', qid: 'Q47213', round: 11 },
+			{ playerName: 'Brett', qid: 'Q223117', round: 12 },
+			{ playerName: 'Brett', qid: 'Q3181500', round: 13 },
+			{ playerName: 'Brett', qid: 'Q380927', round: 14 },
+			{ playerName: 'Brett', qid: 'Q6294', round: 15 },
+			{ playerName: 'Brett', qid: 'Q1262690', round: 16 },
+			{ playerName: 'Brett', qid: 'Q234695', round: 17 },
+			{ playerName: 'Brett', qid: 'Q41142', round: 18 },
+			{ playerName: 'Brett', qid: 'Q562084', round: 19 },
+			{ playerName: 'Brett', qid: 'Q365042', round: 20 },
+			{ playerName: 'Brett', qid: 'Q359442', round: 21 },
+			{ playerName: 'Brett', qid: 'Q380433', round: 22 },
+			{ playerName: 'Brett', qid: 'Q3240869', round: 23 },
+			{ playerName: 'Brett', qid: 'Q331587', round: 24 },
+			{ playerName: 'Brett', qid: 'Q310586', round: 25 },
+			{ playerName: 'Becky', qid: 'Q104266', round: 1 },
+			{ playerName: 'Becky', qid: 'Q206112', round: 2 },
+			{ playerName: 'Becky', qid: 'Q259998', round: 3 },
+			{ playerName: 'Becky', qid: 'Q529294', round: 4 },
+			{ playerName: 'Becky', qid: 'Q191084', round: 5 },
+			{ playerName: 'Becky', qid: 'Q77688', round: 6 },
+			{ playerName: 'Becky', qid: 'Q144622', round: 7 },
+			{ playerName: 'Becky', qid: 'Q189599', round: 8 },
+			{ playerName: 'Becky', qid: 'Q264748', round: 9 },
+			{ playerName: 'Becky', qid: 'Q392', round: 10 },
+			{ playerName: 'Becky', qid: 'Q150943', round: 11 },
+			{ playerName: 'Becky', qid: 'Q171736', round: 12 },
+			{ playerName: 'Becky', qid: 'Q362422', round: 13 },
+			{ playerName: 'Becky', qid: 'Q302762', round: 14 },
+			{ playerName: 'Becky', qid: 'Q232059', round: 15 },
+			{ playerName: 'Becky', qid: 'Q48259', round: 16 },
+			{ playerName: 'Becky', qid: 'Q455880', round: 17 },
+			{ playerName: 'Becky', qid: 'Q234120', round: 18 },
+			{ playerName: 'Becky', qid: 'Q1354302', round: 19 },
+			{ playerName: 'Becky', qid: 'Q229881', round: 20 },
+			{ playerName: 'Becky', qid: 'Q1345645', round: 21 },
+			{ playerName: 'Becky', qid: 'Q292373', round: 22 },
+			{ playerName: 'Becky', qid: 'Q171312', round: 23 },
+			{ playerName: 'Becky', qid: 'Q229271', round: 24 },
+			{ playerName: 'Becky', qid: 'Q123351', round: 25 },
+            ];
+
+            // Game Dates
+            const startDate = new Date('2024-01-05'); // Change the start date to the first day of the pool
+            const endDate = new Date('2025-01-06');   // Change the end date to be 1 day after the end
+
+            // Constants
+            const BATCH_SIZE = 40; // Adjust based on API limit
+            const API_URL = 'https://www.wikidata.org/w/api.php';
+
+            // State Variables - After vote, insert player name for most unique death
+            let sortDirections = {};
+            let mostUniquePlayer = 'none';
+
+            // Initialize Application
+			document.addEventListener('DOMContentLoaded', () => {
+				showLoadingOverlay();
+				initEventListeners(); // Initialize click handlers for sorting, etc.
+
+				fetchData()  // Fetch data or use cache
+					.finally(() => {
+						hideLoadingOverlay(); // Hide loading overlay after fetch or cache load
+					});
+			});
+
+            // Event Listeners
+            function initEventListeners() {
+                const headers = document.querySelectorAll('#personTable th');
+                headers.forEach(header => {
+                    header.addEventListener('click', () => {
+                        const column = header.getAttribute('data-column');
+                        sortTable(column);
+                    });
+                });
+            }
+
+            // Fetch Data in Batches
+            async function fetchAllData() {
+                let allData = [];
+                for (let i = 0; i < players.length; i += BATCH_SIZE) {
+                    const batchPlayers = players.slice(i, i + BATCH_SIZE);
+                    const batchData = await fetchBatch(batchPlayers);
+                    allData = allData.concat(batchData);
+                    updateProgress((i + BATCH_SIZE) / players.length * 100);
+                }
+                return allData;
+            }
+
+            async function fetchBatch(batchPlayers) {
+                const qids = batchPlayers.map(player => player.qid).join('|');
+                const url = `${API_URL}?action=wbgetentities&ids=${qids}&format=json&origin=*`;
+
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error(`Network response was not ok: ${response.statusText}`);
+                    }
+                    const data = await response.json();
+                    return batchPlayers.map(player => {
+                        const entity = data.entities[player.qid];
+                        const labels = entity.labels.en ? entity.labels.en.value : 'Data not found';
+                        const birthday = formatDate(entity.claims.P569 ? entity.claims.P569[0].mainsnak.datavalue.value.time : '');
+                        const dateOfDeath = formatDate(entity.claims.P570 ? entity.claims.P570[0].mainsnak.datavalue.value.time : '');
+                        return {
+                            playerName: player.playerName,
+                            round: player.round,
+                            name: labels,
+                            birthday: birthday,
+                            dateOfDeath: dateOfDeath
+                        };
+                    });
+                } catch (error) {
+                    console.error('Error fetching batch data:', error);
+                    alert('An error occurred while fetching data. Please try again later.');
+                    return [];
+                }
+            }
+
+            // Process All Data
+			function processAllData(allData) {
+				// Sort allData by playerName and then by round
+				allData.sort((a, b) => {
+					if (a.playerName < b.playerName) return -1;
+					if (a.playerName > b.playerName) return 1;
+					return a.round - b.round;
+				});
+
+				createSummaryTableRows();
+				allData.forEach(data => {
+					addTableRow(data);
+				});
+
+				updateSummaryTable();
+				sortGraveyardTable();
+			}
+
+
+
+            // Create Summary Table Rows
+            function createSummaryTableRows() {
+                const summaryTableBody = document.querySelector('#summaryTable tbody');
+                const uniquePlayers = [...new Set(players.map(player => player.playerName))];
+                uniquePlayers.forEach(playerName => {
+                    const row = summaryTableBody.insertRow();
+                    row.insertCell().innerText = playerName;
+                    for (let i = 0; i < 6; i++) {
+                        row.insertCell().innerText = '';
+                    }
+                });
+            }
+
+            // Add Table Row
+function addTableRow({ playerName, round, name, birthday, dateOfDeath }) {
+    const tableRow = document.createElement('tr');
+    tableRow.classList.add(playerName);
+
+    // Calculate Potential Points and its breakdown
+    const potentialPoints = dateOfDeath ? '' : calculatePotentialPoints(birthday, round, dateOfDeath);
+    const agePointsPotential = dateOfDeath ? '' : Math.max(100 - calculateAge(birthday), 0);
+    const roundPointsPotential = dateOfDeath ? '' : 26 - round;
+    const potentialTooltip = dateOfDeath ? '' : `(${roundPointsPotential} + ${agePointsPotential})`;
+
+    // Calculate Final Points and its breakdown
+    const finalPoints = calculateFinalPoints(birthday, dateOfDeath, round);
+    const agePointsFinal = dateOfDeath ? Math.max(100 - calculateAgeAtDeath(birthday, dateOfDeath), 0) : '';
+    const roundPointsFinal = dateOfDeath ? 26 - round : '';
+    const finalTooltip = dateOfDeath ? `(${roundPointsFinal} + ${agePointsFinal})` : '';
+
+    tableRow.innerHTML = `
+        <td data-label="Player Name">${playerName}</td>
+        <td class="round" data-label="Round">${round}</td>
+        <td data-label="Celebrity Name">${createNameLink(name, dateOfDeath)}</td>
+        <td data-label="Birthday">${birthday}</td>
+        <td data-label="Date of Death">${dateOfDeath}</td>
+        <td class="potential-points" data-label="Potential Points" title="${potentialTooltip}">${potentialPoints}</td>
+        <td class="final-points" data-label="Final Points" title="${finalTooltip}">${finalPoints}</td>
+    `;
+
+    document.querySelector('#personTable tbody').appendChild(tableRow);
+
+    // Add to Graveyard if applicable
+    if (dateOfDeath) {
+        const graveyardRow = tableRow.cloneNode(true);
+        graveyardRow.deleteCell(5); // Remove Potential Points
+        document.querySelector('#graveyardTable tbody').appendChild(graveyardRow);
+    }
+}
+
+            // Create Name Link
+            function createNameLink(name, dateOfDeath) {
+                const wikiTitle = encodeURIComponent(name.replace(/ /g, '_'));
+                const linkText = dateOfDeath ? `${name} ☠️` : name;
+                return `<a href="https://en.wikipedia.org/wiki/${wikiTitle}" target="_blank">${linkText}</a>`;
+            }
+
+            // Update Summary Table
+            function updateSummaryTable() {
+                updateFirstDeathInTopTable();
+                updateLastDeathInTopTable();
+                updateHighestBodyCountInTopTable();
+                updateAgePointsInTopTable();
+				updateMostUniqueInTopTable();
+                updateTotalPointsInTopTable();
+            }
+
+            // Format Date
+			function formatDate(rawDate) {
+				if (rawDate === '') {
+					return rawDate;
+				}
+
+				const dateRegex = /^(\+\d+-\d+-\d+)T.*/;
+				const match = rawDate.match(dateRegex);
+
+				if (match) {
+					const isoDate = match[1];
+					const date = new Date(isoDate);
+					const options = { year: 'numeric', month: 'long', day: 'numeric' };
+					return date.toLocaleDateString('en-US', options);
+				} else {
+					return 'Invalid Date';
+				}
+			}
+
+            // Calculate Potential Points
+function calculatePotentialPoints(birthday, round, dateOfDeath) {
+    if (dateOfDeath) return ''; // If the celebrity is dead, no potential points
+    const age = calculateAge(birthday);
+    const roundPoints = 26 - round; // Calculate round points
+    return Math.max(100 - age, 0) + roundPoints; // Add age points and round points
+}
+
+            // Calculate Final Points
+function calculateFinalPoints(birthday, dateOfDeath, round) {
+    if (!dateOfDeath) return ''; // If the celebrity is still alive, no final points
+
+    const deathDate = new Date(dateOfDeath);
+    if (deathDate < startDate || deathDate > endDate) return 'Disqualified'; // Check if death is within game period
+
+    const ageAtDeath = calculateAgeAtDeath(birthday, dateOfDeath);
+    const roundPoints = 26 - round; // Calculate round points
+    return Math.max(100 - ageAtDeath, 0) + roundPoints; // Add age points and round points
+}
+
+            // Calculate Age
+            function calculateAge(birthday) {
+                if (!birthday) return 0;
+                const birthDate = new Date(birthday);
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const m = today.getMonth() - birthDate.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                return age;
+            }
+
+            // Calculate Age at Death
+            function calculateAgeAtDeath(birthday, dateOfDeath) {
+                if (!birthday || !dateOfDeath) return 0;
+                const birthDate = new Date(birthday);
+                const deathDate = new Date(dateOfDeath);
+                let age = deathDate.getFullYear() - birthDate.getFullYear();
+                const m = deathDate.getMonth() - birthDate.getMonth();
+                if (m < 0 || (m === 0 && deathDate.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                return age;
+            }
+
+            // Sort Table
+            function sortTable(column) {
+                const table = document.getElementById('personTable');
+                const tbody = table.tBodies[0];
+                const rows = Array.from(tbody.rows);
+
+                const dir = sortDirections[column] || 'asc';
+                sortDirections[column] = dir === 'asc' ? 'desc' : 'asc';
+
+                rows.sort((a, b) => {
+                    let x = a.querySelector(`td:nth-child(${getColumnIndex(column)})`).innerText;
+                    let y = b.querySelector(`td:nth-child(${getColumnIndex(column)})`).innerText;
+
+                    if (column === 'round' || column === 'potentialPoints' || column === 'finalPoints') {
+                        x = parseFloat(x) || 0;
+                        y = parseFloat(y) || 0;
+                    } else if (column === 'birthday' || column === 'dateOfDeath') {
+                        x = new Date(x);
+                        y = new Date(y);
+                    } else {
+                        x = x.toLowerCase();
+                        y = y.toLowerCase();
+                    }
+
+                    if (dir === 'asc') {
+                        return x > y ? 1 : -1;
+                    } else {
+                        return x < y ? 1 : -1;
+                    }
+                });
+
+                // Re-append sorted rows
+                rows.forEach(row => tbody.appendChild(row));
+            }
+			
+			// Sort Graveyard Table by Date of Death
+			function sortGraveyardTable() {
+				const table = document.getElementById('graveyardTable');
+				const tbody = table.tBodies[0];
+				const rows = Array.from(tbody.rows);
+
+				rows.sort((a, b) => {
+					const dateA = new Date(a.cells[4].innerText);
+					const dateB = new Date(b.cells[4].innerText);
+					return dateA - dateB;
+				});
+
+				// Re-append sorted rows
+				rows.forEach(row => tbody.appendChild(row));
+			}
+
+            // Get Column Index
+            function getColumnIndex(column) {
+                const headers = document.querySelectorAll('#personTable th');
+                let index = 1;
+                headers.forEach((header, i) => {
+                    if (header.getAttribute('data-column') === column) {
+                        index = i + 1;
+                    }
+                });
+                return index;
+            }
+
+            // Update First Death in Summary Table
+            function updateFirstDeathInTopTable() {
+                const firstDeathPlayer = calculateFirstDeath();
+                updateSummaryCell(1, firstDeathPlayer, 25);
+            }
+
+            // Update Last Death in Summary Table
+            function updateLastDeathInTopTable() {
+                const lastDeathPlayer = calculateLastDeath();
+                updateSummaryCell(2, lastDeathPlayer, 25);
+            }
+
+            // Update Highest Body Count in Summary Table
+			function updateHighestBodyCountInTopTable() {
+				const highestBodyCountPlayers = calculateHighestBodyCount();
+				updateSummaryCell(3, highestBodyCountPlayers, 25); // Pass array of players
+			}
+
+			//Update Most Unique Death in Summary table
+			function updateMostUniqueInTopTable() {
+				const summaryTableRows = document.querySelectorAll('#summaryTable tbody tr');
+
+				summaryTableRows.forEach(row => {
+					const playerNameCell = row.cells[0]; // Assuming Player Name is the first column
+					if (playerNameCell.innerText === mostUniquePlayer) {
+						row.cells[4].innerText = 25; // Assign 25 points to 'Most Unique' column
+					} else {
+						row.cells[4].innerText = ''; // Ensure other players do not have points in this column
+					}
+				});
+			}
+
+            // Update Age Points in Summary Table
+            function updateAgePointsInTopTable() {
+                const agePoints = calculateAgePoints();
+                const summaryRows = document.querySelectorAll('#summaryTable tbody tr');
+                summaryRows.forEach(row => {
+                    const playerName = row.cells[0].innerText;
+                    row.cells[5].innerText = agePoints[playerName] || 0;
+                });
+            }
+
+			// Update Total Points in Summary Table
+			function updateTotalPointsInTopTable() {
+				const summaryRows = Array.from(document.querySelectorAll('#summaryTable tbody tr'));
+				let maxPoints = 0;
+				let winningRow = null;
+
+				// Calculate Total Points for each player
+				summaryRows.forEach(row => {
+					let totalPoints = 0;
+					for (let i = 1; i <= 5; i++) {
+						totalPoints += parseInt(row.cells[i].innerText) || 0;
+					}
+					row.cells[6].innerText = totalPoints;
+
+					if (totalPoints > maxPoints) {
+						maxPoints = totalPoints;
+						winningRow = row;
+					}
+				});
+
+				// Sort summaryRows based on Total Points in descending order
+				summaryRows.sort((a, b) => {
+					const pointsA = parseInt(a.cells[6].innerText) || 0; // Total Points column
+					const pointsB = parseInt(b.cells[6].innerText) || 0;
+					return pointsB - pointsA; // Sort in descending order
+				});
+
+				// Re-append the sorted rows to the tbody
+				const tbody = document.querySelector('#summaryTable tbody');
+				tbody.innerHTML = ''; // Clear existing rows
+				summaryRows.forEach(row => {
+					tbody.appendChild(row);
+				});
+
+				// Highlight Winner (if needed)
+				if (winningRow) {
+					winningRow.style.fontWeight = 'bold';
+					winningRow.style.border = '3px solid #ff686b';
+					winningRow.style.color = '#ff686b';
+				}
+			}
+
+
+            // Update Summary Cell
+			function updateSummaryCell(cellIndex, playerNames, points) {
+				const summaryRows = document.querySelectorAll('#summaryTable tbody tr');
+    
+				// Clear the entire column first
+				summaryRows.forEach(row => {
+					row.cells[cellIndex].innerText = '';
+				});
+
+				// Update cells for players who receive the bonus
+				summaryRows.forEach(row => {
+					const playerNameCell = row.cells[0].innerText;
+					if (playerNames.includes(playerNameCell)) {
+						row.cells[cellIndex].innerText = points;
+					}
+				});
+			}
+
+            // Calculate First Death
+            function calculateFirstDeath() {
+                let earliestDeath = new Date(endDate.getTime() + 1);
+                let playerName = '';
+                const rows = document.querySelectorAll('#personTable tbody tr');
+                rows.forEach(row => {
+                    const deathDate = new Date(row.cells[4].innerText);
+                    if (deathDate >= startDate && deathDate <= endDate && deathDate < earliestDeath) {
+                        earliestDeath = deathDate;
+                        playerName = row.cells[0].innerText;
+                    }
+                });
+                return playerName;
+            }
+
+            // Calculate Last Death
+            function calculateLastDeath() {
+                let latestDeath = new Date(startDate.getTime() - 1);
+                let playerName = '';
+                const rows = document.querySelectorAll('#personTable tbody tr');
+                rows.forEach(row => {
+                    const deathDate = new Date(row.cells[4].innerText);
+                    if (deathDate >= startDate && deathDate <= endDate && deathDate > latestDeath) {
+                        latestDeath = deathDate;
+                        playerName = row.cells[0].innerText;
+                    }
+                });
+                return playerName;
+            }
+
+            // Calculate Highest Body Count
+            function calculateHighestBodyCount() {
+                const bodyCount = {};
+                const rows = document.querySelectorAll('#personTable tbody tr');
+                rows.forEach(row => {
+                    const playerName = row.cells[0].innerText;
+                    const finalPoints = row.cells[6].innerText;
+                    if (!isNaN(finalPoints) && finalPoints !== '' && finalPoints !== 'Disqualified') {
+                        bodyCount[playerName] = (bodyCount[playerName] || 0) + 1;
+                    }
+                });
+                const maxCount = Math.max(...Object.values(bodyCount));
+                return Object.keys(bodyCount).filter(player => bodyCount[player] === maxCount);
+            }
+
+            // Calculate Age Points
+            function calculateAgePoints() {
+                const agePoints = {};
+                const rows = document.querySelectorAll('#personTable tbody tr');
+                rows.forEach(row => {
+                    const playerName = row.cells[0].innerText;
+                    const finalPoints = row.cells[6].innerText;
+                    if (!isNaN(finalPoints) && finalPoints !== '' && finalPoints !== 'Disqualified') {
+                        agePoints[playerName] = (agePoints[playerName] || 0) + parseInt(finalPoints);
+                    }
+                });
+                return agePoints;
+            }
+
+            // Loading Overlay Functions
+            function showLoadingOverlay() {
+                document.getElementById('loadingOverlay').style.display = 'flex';
+            }
+
+            function hideLoadingOverlay() {
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+
+            function updateProgress(percentage) {
+                const progressFill = document.getElementById('progressFill');
+                progressFill.style.width = `${percentage}%`;
+            }
+
+        })();
+    </script>
+</body>
+</html>
