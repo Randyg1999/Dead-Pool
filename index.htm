@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The Dirty Oar 2025 Dead Pool</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+	<script src="contestants.js"></script>
+	<script src="script.js"></script>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay">
+        <div id="loadingPopup">
+            <div id="loadingText">LOADING<span class="blink">...</span></div>
+            <div id="progressBar">
+                <div id="progressFill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <header>
+        <h1>The Dirty Oar 2025 Dead Pool</h1>
+    </header>
+
+    <main>
+        <!-- Player Standings -->
+        <section>
+            <h2>Player Standings</h2>
+            <div class="table-container">
+                <table id="summaryTable">
+                    <thead>
+                        <tr>
+                            <th>Player Name</th>
+                            <th>First Death</th>
+                            <th>Last Death</th>
+                            <th>Highest Body Count</th>
+                            <th>Most Unique Entry</th>
+                            <th>Age & Round Points</th>
+                            <th>Total Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Player rows will be generated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Graveyard -->
+        <section>
+            <h2>👻 The Graveyard 👻</h2>
+            <div class="table-container">
+                <table id="graveyardTable">
+                    <thead>
+                        <tr>
+                            <th>Player Name</th>
+                            <th class="round">Round</th>
+                            <th>Celebrity Name</th>
+                            <th>Birthday</th>
+                            <th>Date of Death</th>
+                            <th class="final-points">Final Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Graveyard rows will be generated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Contestant List -->
+        <section>
+            <h2>Contestant List</h2>
+            <div class="table-container">
+                <table id="personTable">
+                    <thead>
+                        <tr>
+                            <th data-column="playerName">Player Name</th>
+                            <th data-column="round" class="round">Round</th>
+                            <th data-column="name">Celebrity Name</th>
+                            <th data-column="birthday">Birthday</th>
+                            <th data-column="dateOfDeath">Date of Death</th>
+                            <th data-column="potentialPoints" class="potential-points">Potential Points</th>
+                            <th data-column="finalPoints" class="final-points">Final Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Contestant rows will be generated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
