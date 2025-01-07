@@ -53,7 +53,7 @@
 
             // Game Dates
             const startDate = new Date('2025-01-05'); // Change the start date to the first day of the pool
-            const endDate = new Date('2025-01-06');   // Change the end date to be 1 day after the end
+            const endDate = new Date('2026-01-06');   // Change the end date to be 1 day after the end
 
             // Constants
             const BATCH_SIZE = 40; // Adjust based on API limit
