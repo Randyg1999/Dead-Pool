@@ -1,4 +1,4 @@
-        (function() {
+            (function() {
             'use strict';
 
 			// Cache TTL and Connection Check Functions
@@ -52,8 +52,8 @@
 			}
 
             // Game Dates
-            const startDate = new Date('2025-01-05'); // Change the start date to the first day of the pool
-            const endDate = new Date('2026-01-06');   // Change the end date to be 1 day after the end
+const startDate = new Date(Date.UTC(2025, 0, 5));
+const endDate = new Date(Date.UTC(2026, 0, 6));
 
             // Constants
             const BATCH_SIZE = 40; // Adjust based on API limit
@@ -215,23 +215,23 @@ function addTableRow({ playerName, round, name, birthday, dateOfDeath }) {
             }
 
             // Format Date
-			function formatDate(rawDate) {
-				if (rawDate === '') {
-					return rawDate;
-				}
+function formatDate(rawDate) {
+    if (rawDate === '') {
+        return rawDate;
+    }
 
-				const dateRegex = /^(\+\d+-\d+-\d+)T.*/;
-				const match = rawDate.match(dateRegex);
+    const dateRegex = /^(\+\d+-\d+-\d+)T.*/;
+    const match = rawDate.match(dateRegex);
 
-				if (match) {
-					const isoDate = match[1];
-					const date = new Date(isoDate);
-					const options = { year: 'numeric', month: 'long', day: 'numeric' };
-					return date.toLocaleDateString('en-US', options);
-				} else {
-					return 'Invalid Date';
-				}
-			}
+    if (match) {
+        const isoDate = match[1];
+        const date = new Date(isoDate);
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return date.toLocaleDateString('en-US', options);
+    } else {
+        return 'Invalid Date';
+    }
+}
 
             // Calculate Potential Points
 function calculatePotentialPoints(birthday, round, dateOfDeath) {
@@ -243,10 +243,10 @@ function calculatePotentialPoints(birthday, round, dateOfDeath) {
 
             // Calculate Final Points
 function calculateFinalPoints(birthday, dateOfDeath, round) {
-    if (!dateOfDeath) return ''; // If the celebrity is still alive, no final points
-
-    const deathDate = new Date(dateOfDeath);
-    if (deathDate < startDate || deathDate > endDate) return 'Disqualified'; // Check if death is within game period
+if (!dateOfDeath) return '';
+const deathDate = new Date(dateOfDeath + 'T12:00:00Z');
+const deathDateUTC = new Date(Date.UTC(deathDate.getFullYear(), deathDate.getMonth(), deathDate.getDate()));
+if (deathDateUTC < startDate || deathDateUTC > endDate) return 'Disqualified';
 
     const ageAtDeath = calculateAgeAtDeath(birthday, dateOfDeath);
     const roundPoints = 26 - round; // Calculate round points
@@ -254,30 +254,30 @@ function calculateFinalPoints(birthday, dateOfDeath, round) {
 }
 
             // Calculate Age
-            function calculateAge(birthday) {
-                if (!birthday) return 0;
-                const birthDate = new Date(birthday);
-                const today = new Date();
-                let age = today.getFullYear() - birthDate.getFullYear();
-                const m = today.getMonth() - birthDate.getMonth();
-                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-                    age--;
-                }
-                return age;
-            }
+function calculateAge(birthday) {
+    if (!birthday) return 0;
+    const birthDate = new Date(birthday);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    return age;
+}
 
             // Calculate Age at Death
-            function calculateAgeAtDeath(birthday, dateOfDeath) {
-                if (!birthday || !dateOfDeath) return 0;
-                const birthDate = new Date(birthday);
-                const deathDate = new Date(dateOfDeath);
-                let age = deathDate.getFullYear() - birthDate.getFullYear();
-                const m = deathDate.getMonth() - birthDate.getMonth();
-                if (m < 0 || (m === 0 && deathDate.getDate() < birthDate.getDate())) {
-                    age--;
-                }
-                return age;
-            }
+function calculateAgeAtDeath(birthday, dateOfDeath) {
+    if (!birthday || !dateOfDeath) return 0;
+    const birthDate = new Date(birthday);
+    const deathDate = new Date(dateOfDeath);
+    let age = deathDate.getFullYear() - birthDate.getFullYear();
+    const m = deathDate.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && deathDate.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    return age;
+}
 
             // Sort Table
             function sortTable(column) {
@@ -295,10 +295,12 @@ function calculateFinalPoints(birthday, dateOfDeath, round) {
                     if (column === 'round' || column === 'potentialPoints' || column === 'finalPoints') {
                         x = parseFloat(x) || 0;
                         y = parseFloat(y) || 0;
-                    } else if (column === 'birthday' || column === 'dateOfDeath') {
-                        x = new Date(x);
-                        y = new Date(y);
-                    } else {
+} else if (column === 'birthday' || column === 'dateOfDeath') {
+    x = new Date(x + 'T12:00:00Z');
+    y = new Date(y + 'T12:00:00Z');
+    x = new Date(Date.UTC(x.getFullYear(), x.getMonth(), x.getDate()));
+    y = new Date(Date.UTC(y.getFullYear(), y.getMonth(), y.getDate()));
+} else {
                         x = x.toLowerCase();
                         y = y.toLowerCase();
                     }
@@ -315,20 +317,34 @@ function calculateFinalPoints(birthday, dateOfDeath, round) {
             }
 			
 			// Sort Graveyard Table by Date of Death
-			function sortGraveyardTable() {
-				const table = document.getElementById('graveyardTable');
-				const tbody = table.tBodies[0];
-				const rows = Array.from(tbody.rows);
+function sortGraveyardTable() {
+    const table = document.getElementById('graveyardTable');
+    const tbody = table.tBodies[0];
+    const rows = Array.from(tbody.rows);
 
-				rows.sort((a, b) => {
-					const dateA = new Date(a.cells[4].innerText);
-					const dateB = new Date(b.cells[4].innerText);
-					return dateA - dateB;
-				});
+    // Sort rows based on death date
+    rows.sort((a, b) => {
+        const dateStrA = a.cells[4].innerText;
+        const dateStrB = b.cells[4].innerText;
+        
+        const dateA = parseFormattedDate(dateStrA);
+        const dateB = parseFormattedDate(dateStrB);
+        
+        // Handle cases where parsing might fail
+        if (!dateA && !dateB) return 0;
+        if (!dateA) return 1;
+        if (!dateB) return -1;
+        
+        return dateA - dateB;
+    });
 
-				// Re-append sorted rows
-				rows.forEach(row => tbody.appendChild(row));
-			}
+    // Clear and re-append sorted rows
+    while (tbody.firstChild) {
+        tbody.removeChild(tbody.firstChild);
+    }
+    
+    rows.forEach(row => tbody.appendChild(row));
+}
 
             // Get Column Index
             function getColumnIndex(column) {
@@ -428,52 +444,116 @@ function calculateFinalPoints(birthday, dateOfDeath, round) {
 
 
             // Update Summary Cell
-			function updateSummaryCell(cellIndex, playerNames, points) {
-				const summaryRows = document.querySelectorAll('#summaryTable tbody tr');
+function updateSummaryCell(cellIndex, playerNames, points) {
+    const summaryRows = document.querySelectorAll('#summaryTable tbody tr');
     
-				// Clear the entire column first
-				summaryRows.forEach(row => {
-					row.cells[cellIndex].innerText = '';
-				});
+    // Clear the entire column first
+    summaryRows.forEach(row => {
+        row.cells[cellIndex].innerText = '';
+    });
 
-				// Update cells for players who receive the bonus
-				summaryRows.forEach(row => {
-					const playerNameCell = row.cells[0].innerText;
-					if (playerNames.includes(playerNameCell)) {
-						row.cells[cellIndex].innerText = points;
-					}
-				});
-			}
+    // Ensure playerNames is always an array and handle empty/null cases
+    const validPlayerNames = Array.isArray(playerNames) ? playerNames : [playerNames];
+    
+    // Update cells for players who receive the bonus
+    summaryRows.forEach(row => {
+        const playerNameCell = row.cells[0].innerText;
+        if (validPlayerNames.includes(playerNameCell) && playerNameCell !== '') {
+            row.cells[cellIndex].innerText = points;
+        }
+    });
+}
 
             // Calculate First Death
-            function calculateFirstDeath() {
-                let earliestDeath = new Date(endDate.getTime() + 1);
-                let playerName = '';
-                const rows = document.querySelectorAll('#personTable tbody tr');
-                rows.forEach(row => {
-                    const deathDate = new Date(row.cells[4].innerText);
-                    if (deathDate >= startDate && deathDate <= endDate && deathDate < earliestDeath) {
-                        earliestDeath = deathDate;
-                        playerName = row.cells[0].innerText;
-                    }
-                });
-                return playerName;
+function calculateFirstDeath() {
+    let earliestDeath = new Date(Date.UTC(2026, 0, 6)); // Set to endDate + 1 day
+    let playerName = '';
+    const rows = document.querySelectorAll('#personTable tbody tr');
+    
+    rows.forEach(row => {
+        const deathDateStr = row.cells[4].innerText;
+        if (deathDateStr) {
+            const deathDateUTC = parseFormattedDate(deathDateStr);
+            
+            console.log('Processing death date:', {
+                original: deathDateStr,
+                parsed: deathDateUTC,
+                isValid: deathDateUTC !== null,
+                isInRange: deathDateUTC && deathDateUTC >= startDate && deathDateUTC <= endDate
+            });
+            
+            if (deathDateUTC && deathDateUTC >= startDate && deathDateUTC <= endDate) {
+                if (deathDateUTC < earliestDeath) {
+                    earliestDeath = deathDateUTC;
+                    playerName = row.cells[0].innerText;
+                }
             }
+        }
+    });
+    
+    console.log('First death calculated:', {
+        player: playerName,
+        date: earliestDeath
+    });
+    
+    return [playerName];
+}
 
             // Calculate Last Death
-            function calculateLastDeath() {
-                let latestDeath = new Date(startDate.getTime() - 1);
-                let playerName = '';
-                const rows = document.querySelectorAll('#personTable tbody tr');
-                rows.forEach(row => {
-                    const deathDate = new Date(row.cells[4].innerText);
-                    if (deathDate >= startDate && deathDate <= endDate && deathDate > latestDeath) {
-                        latestDeath = deathDate;
-                        playerName = row.cells[0].innerText;
-                    }
-                });
-                return playerName;
+function calculateLastDeath() {
+    let latestDeath = new Date(Date.UTC(2025, 0, 4)); // Set to startDate - 1 day
+    let playerName = '';
+    const rows = document.querySelectorAll('#personTable tbody tr');
+    
+    rows.forEach(row => {
+        const deathDateStr = row.cells[4].innerText;
+        if (deathDateStr) {
+            const deathDateUTC = parseFormattedDate(deathDateStr);
+            
+            console.log('Processing death date for last death:', {
+                original: deathDateStr,
+                parsed: deathDateUTC,
+                isValid: deathDateUTC !== null,
+                isInRange: deathDateUTC && deathDateUTC >= startDate && deathDateUTC <= endDate
+            });
+            
+            if (deathDateUTC && deathDateUTC >= startDate && deathDateUTC <= endDate) {
+                if (deathDateUTC > latestDeath) {
+                    latestDeath = deathDateUTC;
+                    playerName = row.cells[0].innerText;
+                }
             }
+        }
+    });
+    
+    console.log('Last death calculated:', {
+        player: playerName,
+        date: latestDeath
+    });
+    
+    return [playerName];
+}
+
+function parseFormattedDate(dateStr) {
+    if (!dateStr) return null;
+    
+    // Parse date string in "Month DD, YYYY" format
+    const parts = dateStr.match(/(\w+)\s+(\d+),\s+(\d+)/);
+    if (!parts) return null;
+    
+    const months = {
+        'January': 0, 'February': 1, 'March': 2, 'April': 3, 'May': 4, 'June': 5,
+        'July': 6, 'August': 7, 'September': 8, 'October': 9, 'November': 10, 'December': 11
+    };
+    
+    const month = months[parts[1]];
+    const day = parseInt(parts[2]);
+    const year = parseInt(parts[3]);
+    
+    if (month === undefined || isNaN(day) || isNaN(year)) return null;
+    
+    return new Date(Date.UTC(year, month, day));
+}
 
             // Calculate Highest Body Count
             function calculateHighestBodyCount() {
