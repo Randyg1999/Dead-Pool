@@ -210,7 +210,7 @@ function addTableRow({ playerName, round, name, birthday, dateOfDeath }) {
                 updateLastDeathInTopTable();
                 updateHighestBodyCountInTopTable();
                 updateAgePointsInTopTable();
-				updateMostUniqueInTopTable();
+		updateMostUniqueInTopTable();
                 updateTotalPointsInTopTable();
             }
 
@@ -218,24 +218,31 @@ function addTableRow({ playerName, round, name, birthday, dateOfDeath }) {
 function formatDate(rawDate) {
   if (!rawDate) return '';
 
-  // e.g. +1940-07-26T00:00:00Z from Wikidata
+  // Wikidata often has dates like: +1942-03-01T00:00:00Z
   const dateRegex = /^\+(\d+)-(\d+)-(\d+)T/;
   const match = rawDate.match(dateRegex);
 
-  if (match) {
-    const year = parseInt(match[1], 10);
-    const month = parseInt(match[2], 10) - 1;
-    const day = parseInt(match[3], 10);
-
-    const date = new Date(Date.UTC(year, month, day));
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      timeZone: 'UTC'
-    });
+  if (!match) {
+    return 'Invalid Date';
   }
-  return 'Invalid Date';
+
+  const year = parseInt(match[1], 10);
+  const month = parseInt(match[2], 10) - 1; // zero-based
+  const day = parseInt(match[3], 10);
+
+  // Create a UTC date
+  const date = new Date(Date.UTC(year, month, day));
+
+  // Manually format the date string using UTC getters
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  const monthName = monthNames[date.getUTCMonth()];
+  const utcDay = date.getUTCDate();
+  const utcYear = date.getUTCFullYear();
+
+  return `${monthName} ${utcDay}, ${utcYear}`;
 }
 
             // Calculate Potential Points
@@ -539,9 +546,9 @@ function calculateLastDeath() {
 }
 
 function parseFormattedDate(dateStr) {
-  // Expects "January 5, 2025"
   if (!dateStr) return null;
 
+  // Expected format: "January 2, 2025"
   const parts = dateStr.match(/(\w+)\s+(\d+),\s+(\d+)/);
   if (!parts) return null;
 
@@ -555,7 +562,11 @@ function parseFormattedDate(dateStr) {
   const day = parseInt(parts[2], 10);
   const year = parseInt(parts[3], 10);
 
-  if (month === undefined || isNaN(day) || isNaN(year)) return null;
+  if (month === undefined || isNaN(day) || isNaN(year)) {
+    return null;
+  }
+
+  // Create a true UTC date
   return new Date(Date.UTC(year, month, day));
 }
 
