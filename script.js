@@ -216,21 +216,26 @@ function addTableRow({ playerName, round, name, birthday, dateOfDeath }) {
 
             // Format Date
 function formatDate(rawDate) {
-    if (rawDate === '') {
-        return rawDate;
-    }
+  if (!rawDate) return '';
 
-    const dateRegex = /^(\+\d+-\d+-\d+)T.*/;
-    const match = rawDate.match(dateRegex);
+  // e.g. +1940-07-26T00:00:00Z from Wikidata
+  const dateRegex = /^\+(\d+)-(\d+)-(\d+)T/;
+  const match = rawDate.match(dateRegex);
 
-    if (match) {
-        const isoDate = match[1];
-        const date = new Date(isoDate);
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        return date.toLocaleDateString('en-US', options);
-    } else {
-        return 'Invalid Date';
-    }
+  if (match) {
+    const year = parseInt(match[1], 10);
+    const month = parseInt(match[2], 10) - 1;
+    const day = parseInt(match[3], 10);
+
+    const date = new Date(Date.UTC(year, month, day));
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      timeZone: 'UTC'
+    });
+  }
+  return 'Invalid Date';
 }
 
             // Calculate Potential Points
@@ -280,41 +285,40 @@ function calculateAgeAtDeath(birthday, dateOfDeath) {
 }
 
             // Sort Table
-            function sortTable(column) {
-                const table = document.getElementById('personTable');
-                const tbody = table.tBodies[0];
-                const rows = Array.from(tbody.rows);
+function sortTable(column) {
+  const table = document.getElementById('personTable');
+  const tbody = table.tBodies[0];
+  const rows = Array.from(tbody.rows);
 
-                const dir = sortDirections[column] || 'asc';
-                sortDirections[column] = dir === 'asc' ? 'desc' : 'asc';
+  const dir = sortDirections[column] || 'asc';
+  sortDirections[column] = dir === 'asc' ? 'desc' : 'asc';
 
-                rows.sort((a, b) => {
-                    let x = a.querySelector(`td:nth-child(${getColumnIndex(column)})`).innerText;
-                    let y = b.querySelector(`td:nth-child(${getColumnIndex(column)})`).innerText;
+  rows.sort((a, b) => {
+    let x = a.querySelector(`td:nth-child(${getColumnIndex(column)})`).innerText;
+    let y = b.querySelector(`td:nth-child(${getColumnIndex(column)})`).innerText;
 
-                    if (column === 'round' || column === 'potentialPoints' || column === 'finalPoints') {
-                        x = parseFloat(x) || 0;
-                        y = parseFloat(y) || 0;
-} else if (column === 'birthday' || column === 'dateOfDeath') {
-    x = new Date(x + 'T12:00:00Z');
-    y = new Date(y + 'T12:00:00Z');
-    x = new Date(Date.UTC(x.getFullYear(), x.getMonth(), x.getDate()));
-    y = new Date(Date.UTC(y.getFullYear(), y.getMonth(), y.getDate()));
-} else {
-                        x = x.toLowerCase();
-                        y = y.toLowerCase();
-                    }
+    if (column === 'round' || column === 'potentialPoints' || column === 'finalPoints') {
+      x = parseFloat(x) || 0;
+      y = parseFloat(y) || 0;
+    } else if (column === 'birthday' || column === 'dateOfDeath') {
+      x = parseFormattedDate(x);
+      y = parseFormattedDate(y);
+    } else {
+      x = x.toLowerCase();
+      y = y.toLowerCase();
+    }
 
-                    if (dir === 'asc') {
-                        return x > y ? 1 : -1;
-                    } else {
-                        return x < y ? 1 : -1;
-                    }
-                });
+    // Compare
+    if (dir === 'asc') {
+      return x > y ? 1 : -1;
+    } else {
+      return x < y ? 1 : -1;
+    }
+  });
 
-                // Re-append sorted rows
-                rows.forEach(row => tbody.appendChild(row));
-            }
+  // Re‐append sorted rows
+  rows.forEach(row => tbody.appendChild(row));
+}
 			
 			// Sort Graveyard Table by Date of Death
 function sortGraveyardTable() {
@@ -535,24 +539,24 @@ function calculateLastDeath() {
 }
 
 function parseFormattedDate(dateStr) {
-    if (!dateStr) return null;
-    
-    // Parse date string in "Month DD, YYYY" format
-    const parts = dateStr.match(/(\w+)\s+(\d+),\s+(\d+)/);
-    if (!parts) return null;
-    
-    const months = {
-        'January': 0, 'February': 1, 'March': 2, 'April': 3, 'May': 4, 'June': 5,
-        'July': 6, 'August': 7, 'September': 8, 'October': 9, 'November': 10, 'December': 11
-    };
-    
-    const month = months[parts[1]];
-    const day = parseInt(parts[2]);
-    const year = parseInt(parts[3]);
-    
-    if (month === undefined || isNaN(day) || isNaN(year)) return null;
-    
-    return new Date(Date.UTC(year, month, day));
+  // Expects "January 5, 2025"
+  if (!dateStr) return null;
+
+  const parts = dateStr.match(/(\w+)\s+(\d+),\s+(\d+)/);
+  if (!parts) return null;
+
+  const months = {
+    'January': 0, 'February': 1, 'March': 2, 'April': 3, 'May': 4,
+    'June': 5, 'July': 6, 'August': 7, 'September': 8,
+    'October': 9, 'November': 10, 'December': 11
+  };
+
+  const month = months[parts[1]];
+  const day = parseInt(parts[2], 10);
+  const year = parseInt(parts[3], 10);
+
+  if (month === undefined || isNaN(day) || isNaN(year)) return null;
+  return new Date(Date.UTC(year, month, day));
 }
 
             // Calculate Highest Body Count
