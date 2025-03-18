@@ -109,7 +109,7 @@ const endDate = new Date(Date.UTC(2026, 0, 6));
                     const data = await response.json();
                     return batchPlayers.map(player => {
                         const entity = data.entities[player.qid];
-                        const labels = entity.labels.en ? entity.labels.en.value : 'Data not found';
+                        const labels = getLabel(entity);
                         const birthday = formatDate(entity.claims.P569 ? entity.claims.P569[0].mainsnak.datavalue.value.time : '');
                         const dateOfDeath = formatDate(entity.claims.P570 ? entity.claims.P570[0].mainsnak.datavalue.value.time : '');
                         return {
@@ -612,5 +612,20 @@ function parseFormattedDate(dateStr) {
                 const progressFill = document.getElementById('progressFill');
                 progressFill.style.width = `${percentage}%`;
             }
+
+	    function getLabel(entity) {
+            	if (entity.labels) {
+        		if (entity.labels.en) {
+            			return entity.labels.en.value;
+        		} else if (entity.labels.mul) { // "mul" = multiple languages
+            			return entity.labels.mul.value;
+        		} else {
+            // If no "en" or "mul", return the first available language:
+            const firstAvailableLang = Object.keys(entity.labels)[0];
+            return entity.labels[firstAvailableLanguage].value;
+        }
+    }
+    return 'Label not available';
+}
 
         })();
