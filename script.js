@@ -573,7 +573,7 @@
   }
   
   function applyPlayerColors() {
-    if (!settings.playerColors) return; // Safety check
+    if (typeof settings === 'undefined' || !settings.playerColors) return; // Safety check
 
     let styleSheet = document.createElement("style");
     document.head.appendChild(styleSheet);
@@ -583,7 +583,7 @@
     });
 }
 
-applyPlayerColors(); // Call the function to apply colors
+// Don't call applyPlayerColors immediately - wait for settings to load
 
 
   // ==========================================================================
@@ -740,6 +740,7 @@ applyPlayerColors(); // Call the function to apply colors
     showLoadingOverlay();
     initEventListeners();
     initNotifications(); // Initialize notification functionality
+    applyPlayerColors(); // Apply player colors after settings loaded
     fetchData().finally(() => {
       hideLoadingOverlay();
     });
