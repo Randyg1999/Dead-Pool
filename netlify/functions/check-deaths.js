@@ -1,7 +1,5 @@
-// Step-by-step test to find where it crashes
-
-// Small test array - just 3 celebrities
-const testPlayers = [
+// Simple death checker that works
+const players = [
 	{ playerName: 'Alanna', qid: 'Q6176881', round: 1 },
 	{ playerName: 'Alanna', qid: 'Q456321', round: 2 },
 	{ playerName: 'Alanna', qid: 'Q41163', round: 3 },
@@ -205,113 +203,98 @@ const testPlayers = [
 ];
 
 exports.handler = async (event, context) => {
-  console.log('Step-by-step test started');
-  
   try {
-    // Step 1: Test array access
-    const playerCount = testPlayers.length;
-    console.log('Step 1 passed: Array has', playerCount, 'players');
-    
-    // Step 2: Test simple fetch
-    const response = await fetch('https://www.wikidata.org/w/api.php?action=wbgetentities&ids=Q6176881&format=json&origin=*');
-    console.log('Step 2 passed: Fetch response status', response.status);
-    
-    // Step 3: Test JSON parsing
-    const data = await response.json();
-    console.log('Step 3 passed: JSON parsed successfully');
-    
-    // Step 4: Test entity access
-    const entity = data.entities.Q6176881;
-    const name = entity.labels?.en?.value || 'Unknown';
-    console.log('Step 4 passed: Name is', name);
-    
-    // Step 5: Test death detection on ALL celebrities
+    // Use the proven working logic from the test
     const allDeaths = [];
     const batchSize = 20;
     
-    console.log('Starting to check all 200 celebrities for deaths...');
-    
-    for (let i = 0; i < testPlayers.length; i += batchSize) {
-      const batchPlayers = testPlayers.slice(i, i + batchSize);
-      const qids = batchPlayers.map(player => player.qid).join('|');
-      const batchUrl = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${qids}&format=json&origin=*`;
+    for (let i = 0; i < players.length; i += batchSize) {
+      const batch = players.slice(i, i + batchSize);
+      const qids = batch.map(p => p.qid).join('|');
+      const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${qids}&format=json&origin=*`;
       
-      const batchResponse = await fetch(batchUrl);
-      const batchData = await batchResponse.json();
+      const response = await fetch(url);
+      const data = await response.json();
       
-      for (const player of batchPlayers) {
-        const entity = batchData.entities[player.qid];
-        if (entity) {
-          const celebName = entity.labels?.en?.value || 'Unknown';
-          const deathClaim = entity.claims?.P570;
-          const dateOfDeath = deathClaim ? formatDate(deathClaim[0].mainsnak.datavalue.value.time) : null;
+      for (const player of batch) {
+        const entity = data.entities[player.qid];
+        if (entity?.claims?.P570) {
+          const name = entity.labels?.en?.value || 'Unknown';
+          const rawDate = entity.claims.P570[0].mainsnak.datavalue.value.time;
+          const dateOfDeath = formatDate(rawDate);
           
-          if (dateOfDeath) {
-            allDeaths.push({
-              qid: player.qid,
-              name: celebName,
-              playerName: player.playerName,
-              round: player.round,
-              dateOfDeath
-            });
-          }
+          allDeaths.push({
+            name,
+            playerName: player.playerName,
+            dateOfDeath
+          });
         }
       }
-      
-      console.log(`Processed batch ${Math.floor(i/batchSize) + 1}/${Math.ceil(testPlayers.length/batchSize)}`);
     }
     
-    console.log(`Step 5 passed: Found ${allDeaths.length} total deaths out of ${testPlayers.length} celebrities`);
-    
-    // Helper function to format dates
-    function formatDate(rawDate) {
-      if (!rawDate) return null;
-      const dateRegex = /^\+(\d+)-(\d+)-(\d+)T/;
-      const match = rawDate.match(dateRegex);
-      if (!match) return null;
-      
-      const year = parseInt(match[1], 10);
-      const month = parseInt(match[2], 10) - 1;
-      const day = parseInt(match[3], 10);
-      const date = new Date(Date.UTC(year, month, day));
-      
-      const monthNames = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-      ];
-      return `${monthNames[date.getUTCMonth()]} ${date.getUTCDate()}, ${date.getUTCFullYear()}`;
+    // For now, send notifications for all deaths (no storage yet)
+    for (const death of allDeaths) {
+      await sendNotification(death);
     }
     
     return {
       statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
       body: JSON.stringify({
         success: true,
-        message: `All steps passed! Found ${allDeaths.length} deaths`,
-        playerCount: playerCount,
-        testName: name,
-        totalDeaths: allDeaths.length,
-        allDeaths: allDeaths, // Show ALL deaths found
-        timestamp: new Date().toISOString()
+        message: `Found ${allDeaths.length} deaths`,
+        deaths: allDeaths
       })
     };
     
   } catch (error) {
-    console.error('Error at step:', error);
     return {
       statusCode: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
-      body: JSON.stringify({
-        error: 'Step failed',
-        message: error.message,
-        stack: error.stack
-      })
+      body: JSON.stringify({ error: error.message })
     };
   }
 };
+
+function formatDate(rawDate) {
+  if (!rawDate) return null;
+  const dateRegex = /^\+(\d+)-(\d+)-(\d+)T/;
+  const match = rawDate.match(dateRegex);
+  if (!match) return null;
+  
+  const year = parseInt(match[1], 10);
+  const month = parseInt(match[2], 10) - 1;
+  const day = parseInt(match[3], 10);
+  const date = new Date(Date.UTC(year, month, day));
+  
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  return `${monthNames[date.getUTCMonth()]} ${date.getUTCDate()}, ${date.getUTCFullYear()}`;
+}
+
+async function sendNotification(death) {
+  try {
+    const baseUrl = process.env.URL || 'https://dirty-oar-dead-pool.netlify.app';
+    
+    const response = await fetch(`${baseUrl}/.netlify/functions/send-notification`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: '💀 Dead Pool Alert!',
+        body: `${death.name} has died! Check your standings.`,
+        playerName: death.playerName,
+        celebrityName: death.name,
+        dateOfDeath: death.dateOfDeath
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to send notification');
+    }
+    
+    console.log('Notification sent for:', death.name);
+    
+  } catch (error) {
+    console.error('Failed to send notification for', death.name, ':', error);
+  }
+}
