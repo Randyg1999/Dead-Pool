@@ -4,14 +4,21 @@
   "description": "Track celebrity deaths and standings for The Dirty Oar Dead Pool",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#powderblue",
+  "background_color": "#b0e0e6",
   "theme_color": "#ff6b6b",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/favicon.ico",
-      "sizes": "32x32",
-      "type": "image/x-icon"
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%23ff6b6b'/%3E%3Ctext x='96' y='96' font-size='96' text-anchor='middle' dominant-baseline='central'%3E💀%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23ff6b6b'/%3E%3Ctext x='256' y='256' font-size='256' text-anchor='middle' dominant-baseline='central'%3E💀%3C/text%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ],
   "categories": ["games", "entertainment"],
