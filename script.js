@@ -139,10 +139,12 @@
         processAllData(freshData);
       } catch (error) {
         console.error('Error fetching data:', error);
+        hideLoadingOverlay(); // Make sure to hide loading screen on error
         alert('Error fetching data. Please try again later.');
       }
     } else {
       console.log('No internet connection');
+      hideLoadingOverlay(); // Make sure to hide loading screen
       alert('No internet connection detected. Please check your connection and try again.');
     }
   }

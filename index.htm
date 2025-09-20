@@ -4,15 +4,18 @@
     <meta charset="UTF-8">
     <title>The Dirty Oar 2025 Dead Pool</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="styles.css">
+    <meta name="description" content="A small hosted app for The Dirty Oar 2025 Dead Pool featuring player standings, a graveyard, and a contestant list.">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-	<script src="contestants.js"></script>
-	<script src="script.js"></script>
+    <noscript>
+        <p>This application requires JavaScript to run. Please enable JavaScript in your browser settings.</p>
+    </noscript>
+    
     <!-- Loading Overlay -->
-    <div id="loadingOverlay">
+    <div id="loadingOverlay" role="alert" aria-live="assertive">
         <div id="loadingPopup">
-            <div id="loadingText">LOADING<span class="blink">...</span></div>
+            <div id="loadingText">LOADING<span class="blink" aria-hidden="true">...</span></div>
             <div id="progressBar">
                 <div id="progressFill"></div>
             </div>
@@ -23,6 +26,15 @@
     <header>
         <h1>The Dirty Oar 2025 Dead Pool</h1>
     </header>
+
+    <!-- Notification Section -->
+    <div class="notification-section">
+        <button id="notifyButton" class="notify-btn" aria-label="Subscribe to death notifications">
+            <span class="btn-icon">🔔</span>
+            <span class="btn-text">Get Notified When Someone Dies</span>
+        </button>
+        <div id="notifyStatus" class="notify-status"></div>
+    </div>
 
     <main>
         <!-- Player Standings -->
@@ -93,5 +105,8 @@
             </div>
         </section>
     </main>
+
+    <script src="contestants.js" defer></script>
+    <script src="script.js" defer></script>
 </body>
 </html>
