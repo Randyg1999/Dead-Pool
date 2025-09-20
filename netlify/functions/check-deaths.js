@@ -46,6 +46,15 @@ exports.handler = async (event, context) => {
           success: true,
           message: 'No new deaths found',
           totalCelebritiesChecked: players.length,
+          debug: {
+            playersLoaded: players.length,
+            currentDeathsFound: newDeaths.length,
+            lastKnownDeathsCount: (await getLastKnownDeaths()).length,
+            sampleCurrentDeaths: (await fetchCurrentDeaths(players)).slice(0, 3).map(d => ({ 
+              name: d.name, 
+              dateOfDeath: d.dateOfDeath 
+            }))
+          },
           timestamp: new Date().toISOString()
         })
       };
