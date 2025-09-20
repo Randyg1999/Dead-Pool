@@ -731,18 +731,24 @@
   // ==========================================================================
 
   document.addEventListener('DOMContentLoaded', () => {
-    // Wait for settings to be available
-    if (!initializeDates()) {
-      console.error('Settings not loaded yet');
-      return;
+    // Function to check if settings is loaded and initialize
+    function tryInitialize() {
+      if (initializeDates()) {
+        // Settings are loaded, proceed with initialization
+        showLoadingOverlay();
+        initEventListeners();
+        initNotifications(); // Initialize notification functionality
+        applyPlayerColors(); // Apply player colors after settings loaded
+        fetchData().finally(() => {
+          hideLoadingOverlay();
+        });
+      } else {
+        // Settings not loaded yet, try again in 100ms
+        setTimeout(tryInitialize, 100);
+      }
     }
     
-    showLoadingOverlay();
-    initEventListeners();
-    initNotifications(); // Initialize notification functionality
-    applyPlayerColors(); // Apply player colors after settings loaded
-    fetchData().finally(() => {
-      hideLoadingOverlay();
-    });
+    // Start trying to initialize
+    tryInitialize();
   });
 })();
