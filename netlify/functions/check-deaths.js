@@ -256,6 +256,7 @@ exports.handler = async (event, context) => {
           success: true,
           message: 'No deaths found',
           totalChecked: players.length,
+		  sampleDeaths: currentDeaths.filter(d => d.dateOfDeath).slice(0, 5),
           timestamp: new Date().toISOString()
         })
       };
