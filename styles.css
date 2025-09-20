@@ -1,203 +1,270 @@
-    /* Global Styles */
-    body {
-        background-color: powderblue;
-        margin: 0;
-        padding: 0;
-        font-family: Arial, sans-serif;
-    }
+/* ==========================================================================
+   Global Styles & Reset
+   ========================================================================== */
+body {
+    background-color: powderblue;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
 
-    /* Typography */
-    h1, h2 {
-        text-align: center;
-        color: black;
-    }
+/* ==========================================================================
+   Typography
+   ========================================================================== */
+h1, h2 {
+    text-align: center;
+    color: black;
+}
 
-    h1 {
-        font-family: "Cooper Black", serif;
-        text-shadow: 0 0 3px #FF0000;
-		color: gray;
-    }
+h1 {
+    font-family: "Cooper Black", serif;
+    color: gray;
+    text-shadow: 0 0 3px #FF0000;
+}
 
-    /* Table Styles */
-    table {
-        width: 90%;
-        margin: 10px auto;
-        border-collapse: collapse;
-        background-color: lightgrey;
-    }
+/* ==========================================================================
+   Table Styles
+   ========================================================================== */
+table {
+    width: 90%;
+    margin: 10px auto;
+    border-collapse: collapse;
+    background-color: lightgrey;
+}
 
+th, td {
+    border: 1px solid black;
+    padding: 5px;
+    text-align: left;
+    color: #666699;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+/* Center specific columns */
+th.round, td.round,
+th.potential-points, td.potential-points,
+th.final-points, td.final-points {
+    text-align: center;
+}
+
+/* Center text in specific cells */
+.center-text,
+#summaryTable th,
+#summaryTable td {
+    text-align: center;
+}
+
+/* ==========================================================================
+   Hover Effects for Tables
+   ========================================================================== */
+/* Hover effects on table rows for personTable and graveyardTable */
+#personTable tr,
+#graveyardTable tr {
+    border: 1px solid black;
+    transition: border 0.3s;
+}
+
+#personTable tr:hover,
+#graveyardTable tr:hover {
+    border: 2px solid black;
+}
+
+/* Hover effects on table headers for personTable and graveyardTable */
+#personTable th,
+#graveyardTable th {
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#personTable th:hover,
+#graveyardTable th:hover {
+    background-color: #ddd;
+}
+
+/* Global hover effect on all table rows */
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* ==========================================================================
+   Link Styles
+   ========================================================================== */
+#personTable a,
+#graveyardTable a {
+    color: #666699;
+    text-decoration: none;
+}
+
+#personTable a:hover,
+#graveyardTable a:hover {
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   Specialized Styles
+   ========================================================================== */
+/* Graveyard Specific Styles */
+.graveyard-title,
+.graveyard-table {
+    font-family: 'Courier New', monospace;
+}
+
+/* Table Container for responsive scrolling */
+.table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* ==========================================================================
+   Notification Button Styles
+   ========================================================================== */
+.notification-section {
+    text-align: center;
+    margin: 20px auto;
+    padding: 15px;
+}
+
+.notify-btn {
+    background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+    border: none;
+    border-radius: 25px;
+    padding: 15px 25px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+    transition: all 0.3s ease;
+    min-height: 50px;
+    min-width: 280px;
+    justify-content: center;
+}
+
+.notify-btn:hover {
+    background: linear-gradient(135deg, #ff5252, #ff7979);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+}
+
+.notify-btn:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-icon {
+    font-size: 24px;
+}
+
+.btn-text {
+    font-size: 16px;
+}
+
+.notify-status {
+    margin-top: 15px;
+    font-weight: bold;
+    font-size: 14px;
+    min-height: 20px;
+}
+
+.notify-status.success {
+    color: #28a745;
+}
+
+.notify-status.error {
+    color: #dc3545;
+}
+
+.notify-status.info {
+    color: #17a2b8;
+}
+
+/* ==========================================================================
+   Responsive Design
+   ========================================================================== */
+@media screen and (max-width: 600px) {
     th, td {
-        border: 1px solid black;
+        font-size: 14px;
         padding: 5px;
-        text-align: left;
-        color: #666699;
-        font-weight: bold;
-        font-size: 20px;
     }
-	
-	/* Center the 'Round', 'Potential Points', and 'Final Points' columns */
-	th.round, td.round,
-	th.potential-points, td.potential-points,
-	th.final-points, td.final-points {
-		text-align: center;
-	}
+    
+    .notify-btn {
+        min-width: 250px;
+        padding: 12px 20px;
+        font-size: 16px;
+    }
+    
+    .btn-text {
+        font-size: 14px;
+    }
+}
 
+/* ==========================================================================
+   Loading Overlay
+   ========================================================================== */
+#loadingOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
 
-    /* Center text in specific cells */
-    .center-text,
-    #summaryTable th,
-    #summaryTable td {
-        text-align: center;
-    }
+#loadingPopup {
+    text-align: center;
+}
 
-    /* Hover Effects for Rows */
-    #personTable tr,
-    #graveyardTable tr {
-        border: 1px solid black;
-        transition: border 0.3s;
-    }
+#loadingText {
+    font-family: 'Courier New', monospace;
+    font-size: 24px;
+    color: #00ff00;
+    text-shadow: 0 0 5px #00ff00;
+    margin-bottom: 20px;
+}
 
-    #personTable tr:hover,
-    #graveyardTable tr:hover {
-        border: 2px solid black;
-    }
+#progressBar {
+    width: 200px;
+    height: 20px;
+    background-color: #333;
+    border: 2px solid #00ff00;
+    margin: 0 auto;
+}
 
-    /* Hover Effects for Headers */
-    #personTable th,
-    #graveyardTable th {
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
+#progressFill {
+    width: 0%;
+    height: 100%;
+    background-color: #00ff00;
+    transition: width 0.5s;
+}
 
-    #personTable th:hover,
-    #graveyardTable th:hover {
-        background-color: #ddd;
-    }
+/* ==========================================================================
+   Animations
+   ========================================================================== */
+@keyframes blink {
+    0% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+}
 
-    /* Link Styles */
-    #personTable a,
-    #graveyardTable a {
-        color: #666699;
-        text-decoration: none;
-    }
+.blink {
+    animation: blink 1s infinite;
+}
 
-    #personTable a:hover,
-    #graveyardTable a:hover {
-        text-decoration: underline;
-    }
-
-    /* Graveyard Styles */
-    .graveyard-title,
-    .graveyard-table {
-        font-family: 'Courier New', monospace;
-    }
-
-    /* Table Container */
-    .table-container {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    /* Responsive Design */
-    @media screen and (max-width: 600px) {
-        th, td {
-            font-size: 14px;
-            padding: 5px;
-        }
-    }
-
-    /* Loading Overlay */
-    #loadingOverlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.8);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-    }
-
-    #loadingPopup {
-        text-align: center;
-    }
-
-    #loadingText {
-        font-family: 'Courier New', monospace;
-        font-size: 24px;
-        color: #00ff00;
-        text-shadow: 0 0 5px #00ff00;
-        margin-bottom: 20px;
-    }
-
-    #progressBar {
-        width: 200px;
-        height: 20px;
-        background-color: #333;
-        border: 2px solid #00ff00;
-        margin: 0 auto;
-    }
-
-    #progressFill {
-        width: 0%;
-        height: 100%;
-        background-color: #00ff00;
-        transition: width 0.5s;
-    }
-
-    @keyframes blink {
-        0% { opacity: 0; }
-        50% { opacity: 1; }
-        100% { opacity: 0; }
-    }
-
-    .blink {
-        animation: blink 1s infinite;
-    }
-
-    /* Player Colors */
-    .Randy {
-        background-color: #a0ced9;
-    }
-
-    .Brett {
-        background-color: #adf7b6;
-    }
-
-    .Julie_E{
-        background-color: #ffee93;
-    }
-
-    .Becky {
-        background-color: #ffcf81;
-    }
-
-    .Amanda {
-        background-color: #cdb7dc;
-    }
-
-    .Julie_L {
-        background-color: pink;
-    }
-
-    .Shawn {
-        background-color: #68c4af;
-    }
-	
-	.Alanna {
-        background-color: lightgrey;
-    }
-
-    /* Highlight Winning Row */
-    .winner {
-        font-weight: bold;
-        border: 3px solid #ff686b;
-        color: #ff686b;
-    }
-
-    /* Table Row Hover Effects */
-    tr:hover {
-        background-color: #f1f1f1;
-    }
+/* ==========================================================================
+   Highlight Winning Row
+   ========================================================================== */
+.winner {
+    font-weight: bold;
+    border: 3px solid #ff686b;
+    color: #ff686b;
+}
