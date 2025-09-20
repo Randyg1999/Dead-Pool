@@ -16,7 +16,30 @@ exports.handler = async (event, context) => {
     console.log(`Loaded ${players.length} celebrities from contestants.js`);
     
     // Check for new deaths
-    const newDeaths = await checkForNewDeaths(players);
+    const currentDeaths = await fetchCurrentDeaths(players);
+    console.log(`Found ${currentDeaths.length} current death records`);
+    console.log('Sample deaths:', currentDeaths.filter(d => d.dateOfDeath).slice(0, 3));
+    
+    const lastKnownDeaths = await getLastKnownDeaths();
+    console.log(`Last known deaths: ${lastKnownDeaths.length}`);
+    
+    const newDeaths = [];
+    
+    // Compare to find new deaths
+    for (const current of currentDeaths) {
+      const wasAlreadyDead = lastKnownDeaths.find(known => 
+        known.qid === current.qid && known.dateOfDeath
+      );
+      
+      if (current.dateOfDeath && !wasAlreadyDead) {
+        newDeaths.push(current);
+      }
+    }
+    
+    console.log(`Identified ${newDeaths.length} new deaths`);
+    if (newDeaths.length > 0) {
+      console.log('New deaths:', newDeaths.map(d => d.name));
+    }
     
     if (newDeaths.length > 0) {
       console.log('New deaths found:', newDeaths.length);
@@ -46,15 +69,6 @@ exports.handler = async (event, context) => {
           success: true,
           message: 'No new deaths found',
           totalCelebritiesChecked: players.length,
-          debug: {
-            playersLoaded: players.length,
-            currentDeathsFound: newDeaths.length,
-            lastKnownDeathsCount: (await getLastKnownDeaths()).length,
-            sampleCurrentDeaths: (await fetchCurrentDeaths(players)).slice(0, 3).map(d => ({ 
-              name: d.name, 
-              dateOfDeath: d.dateOfDeath 
-            }))
-          },
           timestamp: new Date().toISOString()
         })
       };
