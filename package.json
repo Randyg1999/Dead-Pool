@@ -1,0 +1,8 @@
+{
+  "name": "dead-pool-notifications",
+  "version": "1.0.0",
+  "description": "Dead pool with automated notifications",
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
+}
