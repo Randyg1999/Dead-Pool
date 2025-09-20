@@ -5,14 +5,23 @@
   // Constants & Global State
   // ==========================================================================
   const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-  const startDate = new Date(settings.startDate);
-  const endDate = new Date(settings.endDate);
+  let startDate, endDate; // Will be set when settings loads
   const BATCH_SIZE = 40; // Adjust based on API limit
   const API_URL = 'https://www.wikidata.org/w/api.php';
 
   // State Variables
   const sortDirections = {};
   let mostUniquePlayer = 'none';
+
+  // Initialize dates when settings is available
+  function initializeDates() {
+    if (typeof settings !== 'undefined') {
+      startDate = new Date(settings.startDate);
+      endDate = new Date(settings.endDate);
+      return true;
+    }
+    return false;
+  }
 
   // ==========================================================================
   // Utility Functions
@@ -722,6 +731,12 @@ applyPlayerColors(); // Call the function to apply colors
   // ==========================================================================
 
   document.addEventListener('DOMContentLoaded', () => {
+    // Wait for settings to be available
+    if (!initializeDates()) {
+      console.error('Settings not loaded yet');
+      return;
+    }
+    
     showLoadingOverlay();
     initEventListeners();
     initNotifications(); // Initialize notification functionality
