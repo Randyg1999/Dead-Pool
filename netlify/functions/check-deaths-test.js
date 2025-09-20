@@ -225,6 +225,49 @@ exports.handler = async (event, context) => {
     const name = entity.labels?.en?.value || 'Unknown';
     console.log('Step 4 passed: Name is', name);
     
+    // Step 5: Test death detection on a few celebrities
+    const testDeaths = [];
+    const testQids = ['Q6176881', 'Q456321', 'Q41163']; // First 3 from list
+    
+    for (const qid of testQids) {
+      const testResponse = await fetch(`https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${qid}&format=json&origin=*`);
+      const testData = await testResponse.json();
+      const testEntity = testData.entities[qid];
+      
+      if (testEntity) {
+        const testName = testEntity.labels?.en?.value || 'Unknown';
+        const deathClaim = testEntity.claims?.P570;
+        const dateOfDeath = deathClaim ? formatDate(deathClaim[0].mainsnak.datavalue.value.time) : null;
+        
+        testDeaths.push({
+          qid,
+          name: testName,
+          dateOfDeath
+        });
+      }
+    }
+    
+    console.log('Step 5 passed: Checked', testDeaths.length, 'celebrities for deaths');
+    
+    // Helper function to format dates
+    function formatDate(rawDate) {
+      if (!rawDate) return null;
+      const dateRegex = /^\+(\d+)-(\d+)-(\d+)T/;
+      const match = rawDate.match(dateRegex);
+      if (!match) return null;
+      
+      const year = parseInt(match[1], 10);
+      const month = parseInt(match[2], 10) - 1;
+      const day = parseInt(match[3], 10);
+      const date = new Date(Date.UTC(year, month, day));
+      
+      const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+      ];
+      return `${monthNames[date.getUTCMonth()]} ${date.getUTCDate()}, ${date.getUTCFullYear()}`;
+    }
+    
     return {
       statusCode: 200,
       headers: {
@@ -236,6 +279,7 @@ exports.handler = async (event, context) => {
         message: 'All steps passed!',
         playerCount: playerCount,
         testName: name,
+        sampleDeaths: testDeaths, // Show actual death detection results
         timestamp: new Date().toISOString()
       })
     };
