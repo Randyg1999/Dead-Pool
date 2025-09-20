@@ -1,7 +1,6 @@
-// Function to send push notifications to all subscribers
+// Function to send push notifications to all subscribers with persistent storage
 
-// In-memory storage for demo (matches subscribe.js)
-const subscriptions = new Map();
+const { getStore } = require('@netlify/blobs');
 
 exports.handler = async (event, context) => {
   const headers = {
@@ -27,8 +26,18 @@ exports.handler = async (event, context) => {
     
     console.log('Sending notification:', { title, body, playerName, celebrityName });
     
-    // Get all subscriptions (in production, this would come from database)
-    const allSubscriptions = Array.from(subscriptions.values());
+    // Get subscriptions from blob storage
+    const store = getStore('subscriptions');
+    let allSubscriptions = [];
+    
+    try {
+      const subscriptionData = await store.get('all-subscriptions');
+      if (subscriptionData) {
+        allSubscriptions = JSON.parse(subscriptionData);
+      }
+    } catch (error) {
+      console.log('No subscriptions found in storage');
+    }
     
     if (allSubscriptions.length === 0) {
       return {
@@ -113,15 +122,13 @@ exports.handler = async (event, context) => {
   }
 };
 
-// Send push notification using Web Push Protocol
+// Send push notification using Web Push Protocol (simplified)
 async function sendPushNotification(subscription, payload) {
-  // For testing/demo purposes, we'll use a simplified approach
-  // In production, you'd use proper VAPID authentication and web-push library
-  
   const notificationData = JSON.stringify(payload);
   
   try {
-    // This is a simplified version - real implementation would use web-push library
+    // This is a simplified version for testing
+    // In production, you'd use proper VAPID authentication and web-push library
     const response = await fetch(subscription.endpoint, {
       method: 'POST',
       headers: {
@@ -143,20 +150,4 @@ async function sendPushNotification(subscription, payload) {
     console.error('Push notification failed:', error);
     throw error;
   }
-}
-
-// Test endpoint to manually trigger a notification
-if (process.env.NODE_ENV === 'development') {
-  exports.testNotification = async () => {
-    return await exports.handler({
-      httpMethod: 'POST',
-      body: JSON.stringify({
-        title: '💀 Test Death Alert',
-        body: 'Test Celebrity has died! This is a test notification.',
-        playerName: 'TestPlayer',
-        celebrityName: 'Test Celebrity',
-        dateOfDeath: 'January 1, 2025'
-      })
-    }, {});
-  };
 }
