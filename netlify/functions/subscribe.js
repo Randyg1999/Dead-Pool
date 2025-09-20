@@ -1,6 +1,6 @@
-// Netlify Function to handle push notification subscriptions
+// Netlify Function to handle push notification subscriptions with persistent storage
 
-const subscriptions = new Map(); // In-memory storage for demo
+const { getStore } = require('@netlify/blobs');
 
 exports.handler = async (event, context) => {
   // Enable CORS
@@ -39,12 +39,32 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Store subscription (in real app, save to database)
+    // Get blob store
+    const store = getStore('subscriptions');
+    
+    // Get existing subscriptions
+    let subscriptions = [];
+    try {
+      const existingData = await store.get('all-subscriptions');
+      if (existingData) {
+        subscriptions = JSON.parse(existingData);
+      }
+    } catch (error) {
+      console.log('No existing subscriptions found, starting fresh');
+    }
+    
+    // Add new subscription (with simple deduplication)
     const subscriptionId = Date.now().toString();
-    subscriptions.set(subscriptionId, subscription);
+    subscription.id = subscriptionId;
+    subscription.addedAt = new Date().toISOString();
+    
+    subscriptions.push(subscription);
+    
+    // Save back to blob storage
+    await store.set('all-subscriptions', JSON.stringify(subscriptions));
     
     console.log('New subscription saved:', subscriptionId);
-    console.log('Total subscriptions:', subscriptions.size);
+    console.log('Total subscriptions:', subscriptions.length);
 
     return {
       statusCode: 200,
@@ -52,6 +72,7 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({ 
         success: true, 
         subscriptionId,
+        totalSubscribers: subscriptions.length,
         message: 'Subscription saved successfully' 
       })
     };
