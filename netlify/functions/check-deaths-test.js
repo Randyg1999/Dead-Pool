@@ -225,29 +225,43 @@ exports.handler = async (event, context) => {
     const name = entity.labels?.en?.value || 'Unknown';
     console.log('Step 4 passed: Name is', name);
     
-    // Step 5: Test death detection on a few celebrities
-    const testDeaths = [];
-    const testQids = ['Q6176881', 'Q456321', 'Q41163']; // First 3 from list
+    // Step 5: Test death detection on ALL celebrities
+    const allDeaths = [];
+    const batchSize = 20;
     
-    for (const qid of testQids) {
-      const testResponse = await fetch(`https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${qid}&format=json&origin=*`);
-      const testData = await testResponse.json();
-      const testEntity = testData.entities[qid];
+    console.log('Starting to check all 200 celebrities for deaths...');
+    
+    for (let i = 0; i < testPlayers.length; i += batchSize) {
+      const batchPlayers = testPlayers.slice(i, i + batchSize);
+      const qids = batchPlayers.map(player => player.qid).join('|');
+      const batchUrl = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${qids}&format=json&origin=*`;
       
-      if (testEntity) {
-        const testName = testEntity.labels?.en?.value || 'Unknown';
-        const deathClaim = testEntity.claims?.P570;
-        const dateOfDeath = deathClaim ? formatDate(deathClaim[0].mainsnak.datavalue.value.time) : null;
-        
-        testDeaths.push({
-          qid,
-          name: testName,
-          dateOfDeath
-        });
+      const batchResponse = await fetch(batchUrl);
+      const batchData = await batchResponse.json();
+      
+      for (const player of batchPlayers) {
+        const entity = batchData.entities[player.qid];
+        if (entity) {
+          const celebName = entity.labels?.en?.value || 'Unknown';
+          const deathClaim = entity.claims?.P570;
+          const dateOfDeath = deathClaim ? formatDate(deathClaim[0].mainsnak.datavalue.value.time) : null;
+          
+          if (dateOfDeath) {
+            allDeaths.push({
+              qid: player.qid,
+              name: celebName,
+              playerName: player.playerName,
+              round: player.round,
+              dateOfDeath
+            });
+          }
+        }
       }
+      
+      console.log(`Processed batch ${Math.floor(i/batchSize) + 1}/${Math.ceil(testPlayers.length/batchSize)}`);
     }
     
-    console.log('Step 5 passed: Checked', testDeaths.length, 'celebrities for deaths');
+    console.log(`Step 5 passed: Found ${allDeaths.length} total deaths out of ${testPlayers.length} celebrities`);
     
     // Helper function to format dates
     function formatDate(rawDate) {
@@ -276,10 +290,11 @@ exports.handler = async (event, context) => {
       },
       body: JSON.stringify({
         success: true,
-        message: 'All steps passed!',
+        message: `All steps passed! Found ${allDeaths.length} deaths`,
         playerCount: playerCount,
         testName: name,
-        sampleDeaths: testDeaths, // Show actual death detection results
+        totalDeaths: allDeaths.length,
+        allDeaths: allDeaths, // Show ALL deaths found
         timestamp: new Date().toISOString()
       })
     };
