@@ -1,0 +1,19 @@
+{
+  "name": "The Dirty Oar 2025 Dead Pool",
+  "short_name": "Dead Pool",
+  "description": "Track celebrity deaths and standings for The Dirty Oar Dead Pool",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#powderblue",
+  "theme_color": "#ff6b6b",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "32x32",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["games", "entertainment"],
+  "scope": "/"
+}

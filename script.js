@@ -594,7 +594,20 @@
 
   // Check if browser supports notifications
   function isNotificationSupported() {
-    return 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
+    // Check basic support
+    if (!('Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window)) {
+      return false;
+    }
+    
+    // Check for iOS Safari - needs to be installed as PWA
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isStandalone = window.navigator.standalone === true;
+    
+    if (isIOS && !isStandalone) {
+      return 'ios-install';
+    }
+    
+    return true;
   }
 
   // Initialize notification functionality
@@ -605,9 +618,20 @@
     if (!subscribeBtn) return;
 
     // Check browser support
-    if (!isNotificationSupported()) {
+    const supportStatus = isNotificationSupported();
+    
+    if (supportStatus === false) {
       statusDiv.textContent = 'Push notifications not supported in this browser';
       statusDiv.className = 'notify-status error';
+      subscribeBtn.disabled = true;
+      return;
+    }
+    
+    if (supportStatus === 'ios-install') {
+      const btnText = subscribeBtn.querySelector('.btn-text');
+      btnText.textContent = 'Add to Home Screen for Notifications';
+      statusDiv.textContent = 'On iPhone: tap Share → Add to Home Screen to enable notifications';
+      statusDiv.className = 'notify-status info';
       subscribeBtn.disabled = true;
       return;
     }
