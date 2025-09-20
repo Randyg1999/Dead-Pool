@@ -1,4 +1,4 @@
-// Simple function to check how many subscriptions are stored
+// Debug function to check Netlify Blobs availability
 
 const { getStore } = require('@netlify/blobs');
 
@@ -9,31 +9,27 @@ exports.handler = async (event, context) => {
   };
 
   try {
-    // Get blob store
-    const store = getStore('subscriptions');
+    // Try to get site info
+    console.log('Environment variables:');
+    console.log('NETLIFY_SITE_ID:', process.env.NETLIFY_SITE_ID);
+    console.log('NETLIFY:', process.env.NETLIFY);
     
-    // Get existing subscriptions
-    let subscriptions = [];
-    try {
-      const existingData = await store.get('all-subscriptions');
-      if (existingData) {
-        subscriptions = JSON.parse(existingData);
-      }
-    } catch (error) {
-      console.log('No subscriptions found');
-    }
+    // Try to create store
+    const store = getStore('test-store');
+    console.log('Store created successfully');
+    
+    // Try a simple operation
+    await store.set('test-key', 'test-value');
+    const value = await store.get('test-key');
     
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         success: true,
-        totalSubscriptions: subscriptions.length,
-        subscriptions: subscriptions.map(sub => ({
-          id: sub.id,
-          addedAt: sub.addedAt,
-          endpoint: sub.endpoint ? sub.endpoint.substring(0, 50) + '...' : 'No endpoint'
-        }))
+        message: 'Netlify Blobs is working!',
+        testValue: value,
+        siteId: process.env.NETLIFY_SITE_ID || 'Not found'
       })
     };
 
@@ -42,7 +38,10 @@ exports.handler = async (event, context) => {
       statusCode: 500,
       headers,
       body: JSON.stringify({
-        error: error.message
+        success: false,
+        error: error.message,
+        siteId: process.env.NETLIFY_SITE_ID || 'Not found',
+        netlifyEnv: process.env.NETLIFY || 'Not found'
       })
     };
   }
