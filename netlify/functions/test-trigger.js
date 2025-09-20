@@ -15,7 +15,7 @@ exports.handler = async (event, context) => {
     console.log('Manual death check triggered');
     
     // Call the check-deaths function
-    const checkDeathsResponse = await fetch(`${process.env.URL}/.netlify/functions/check-deaths`, {
+    const checkDeathsResponse = await fetch(`${process.env.URL}/.netlify/functions/check-deaths-test`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' }
     });
