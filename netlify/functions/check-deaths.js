@@ -274,6 +274,7 @@ function formatDate(rawDate) {
 
 async function sendNotification(death) {
   try {
+    console.log('Sending notification for death:', death.name);
     const baseUrl = process.env.URL || 'https://dirty-oar-dead-pool.netlify.app';
     
     const response = await fetch(`${baseUrl}/.netlify/functions/send-notification`, {
@@ -289,12 +290,23 @@ async function sendNotification(death) {
     });
     
     if (!response.ok) {
-      throw new Error('Failed to send notification');
+      console.error('Notification failed with status:', response.status);
+      throw new Error(`Failed to send notification: ${response.status}`);
     }
     
-    console.log('Notification sent for:', death.name);
+    // Try to parse JSON, but don't crash if it fails
+    let result;
+    try {
+      result = await response.json();
+    } catch (jsonError) {
+      console.warn('Response was not JSON:', jsonError.message);
+      result = { message: 'Non-JSON response' };
+    }
+    
+    console.log('Notification sent successfully for:', death.name);
     
   } catch (error) {
-    console.error('Failed to send notification for', death.name, ':', error);
+    console.error('Failed to send notification for', death.name, ':', error.message);
+    // Don't throw - we want to continue processing other deaths
   }
 }
