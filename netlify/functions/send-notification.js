@@ -63,10 +63,10 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Prepare notification payload
+    // Prepare notification payload with player name
     const notificationPayload = {
       title: title || '💀 Dead Pool Alert!',
-      body: body || `${celebrityName} has died! Check your standings.`,
+      body: body || `${celebrityName} has died! ${playerName}'s pick. Check your standings.`,
       icon: '/favicon.ico',
       badge: '/favicon.ico',
       tag: 'dead-pool-death',

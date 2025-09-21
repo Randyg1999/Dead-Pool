@@ -410,7 +410,7 @@ function formatDate(rawDate) {
 
 async function sendNotification(death) {
   try {
-    console.log(`📱 Sending notification for NEW death: ${death.name}`);
+    console.log(`📱 Sending notification for NEW death: ${death.name} (${death.playerName}'s pick)`);
     const baseUrl = process.env.URL || 'https://dirty-oar-dead-pool.netlify.app';
     
     const response = await fetch(`${baseUrl}/.netlify/functions/send-notification`, {
@@ -418,7 +418,7 @@ async function sendNotification(death) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         title: '💀 Dead Pool Alert!',
-        body: `${death.name} has died! Check your standings.`,
+        body: `${death.name} has died! ${death.playerName}'s pick. Check your standings.`,
         playerName: death.playerName,
         celebrityName: death.name,
         dateOfDeath: death.dateOfDeath
@@ -429,7 +429,7 @@ async function sendNotification(death) {
       throw new Error('Failed to send notification');
     }
     
-    console.log('✅ Notification sent for NEW death:', death.name);
+    console.log(`✅ Notification sent for NEW death: ${death.name} (${death.playerName}'s pick)`);
     
   } catch (error) {
     console.error('❌ Failed to send notification for', death.name, ':', error);
