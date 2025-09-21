@@ -1,6 +1,4 @@
-// Function to send push notifications to all subscribers with persistent storage
-
-const { getStore } = require('@netlify/blobs');
+// Function to send push notifications to all subscribers using GitHub Gist storage
 
 exports.handler = async (event, context) => {
   const headers = {
@@ -26,17 +24,14 @@ exports.handler = async (event, context) => {
     
     console.log('Sending notification:', { title, body, playerName, celebrityName });
     
-    // Get subscriptions from blob storage
-    const store = getStore('subscriptions');
+    // Get subscriptions from GitHub Gist
     let allSubscriptions = [];
     
     try {
-      const subscriptionData = await store.get('all-subscriptions');
-      if (subscriptionData) {
-        allSubscriptions = JSON.parse(subscriptionData);
-      }
+      const subscriptionData = await getSubscriptionsFromGist();
+      allSubscriptions = subscriptionData.subscriptions || [];
     } catch (error) {
-      console.log('No subscriptions found in storage');
+      console.log('No subscriptions found in GitHub Gist:', error.message);
     }
     
     if (allSubscriptions.length === 0) {
@@ -46,7 +41,8 @@ exports.handler = async (event, context) => {
         body: JSON.stringify({
           success: true,
           message: 'No subscribers to notify',
-          sentCount: 0
+          sentCount: 0,
+          storage: 'GitHub Gist'
         })
       };
     }
@@ -100,6 +96,7 @@ exports.handler = async (event, context) => {
         sentCount: successCount,
         failedCount: failureCount,
         totalSubscribers: allSubscriptions.length,
+        storage: 'GitHub Gist',
         notification: {
           title: notificationPayload.title,
           body: notificationPayload.body,
@@ -121,6 +118,56 @@ exports.handler = async (event, context) => {
     };
   }
 };
+
+// Get subscriptions from GitHub Gist
+async function getSubscriptionsFromGist() {
+  const token = process.env.GITHUB_TOKEN;
+  if (!token) {
+    throw new Error('GitHub token not configured');
+  }
+
+  // First, try to find existing gist
+  const gistsResponse = await fetch('https://api.github.com/gists', {
+    headers: {
+      'Authorization': `token ${token}`,
+      'Accept': 'application/vnd.github.v3+json'
+    }
+  });
+
+  if (!gistsResponse.ok) {
+    throw new Error(`GitHub API error: ${gistsResponse.status}`);
+  }
+
+  const gists = await gistsResponse.json();
+  const deadPoolGist = gists.find(gist => 
+    gist.files['dead-pool-subscriptions.json'] || 
+    gist.description === 'Dead Pool Notification Subscriptions'
+  );
+
+  if (!deadPoolGist) {
+    return { subscriptions: [], gistId: null };
+  }
+
+  // Get the gist content
+  const gistResponse = await fetch(deadPoolGist.url, {
+    headers: {
+      'Authorization': `token ${token}`,
+      'Accept': 'application/vnd.github.v3+json'
+    }
+  });
+
+  if (!gistResponse.ok) {
+    throw new Error(`Failed to fetch gist: ${gistResponse.status}`);
+  }
+
+  const gistData = await gistResponse.json();
+  const fileContent = gistData.files['dead-pool-subscriptions.json'].content;
+  
+  return {
+    subscriptions: JSON.parse(fileContent),
+    gistId: deadPoolGist.id
+  };
+}
 
 // Send push notification using Web Push Protocol (simplified)
 async function sendPushNotification(subscription, payload) {
