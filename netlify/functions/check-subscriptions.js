@@ -1,5 +1,3 @@
-// Debug function to check Netlify Blobs availability
-
 const { getStore } = require('@netlify/blobs');
 
 exports.handler = async (event, context) => {
@@ -9,18 +7,20 @@ exports.handler = async (event, context) => {
   };
 
   try {
-    // Try to get site info
-    console.log('Environment variables:');
-    console.log('NETLIFY_SITE_ID:', process.env.NETLIFY_SITE_ID);
-    console.log('NETLIFY:', process.env.NETLIFY);
+    console.log('Environment check:', {
+      NETLIFY_SITE_ID: process.env.NETLIFY_SITE_ID ? 'Present' : 'Missing',
+      NETLIFY: process.env.NETLIFY ? 'Present' : 'Missing',
+      context: context ? 'Present' : 'Missing'
+    });
     
-    // Try to create store
-    const store = getStore('test-store');
-    console.log('Store created successfully');
+    // This should work automatically in Netlify environment
+    const store = getStore('subscriptions');
+    await store.set('test-key', JSON.stringify({ 
+      test: true, 
+      timestamp: new Date().toISOString() 
+    }));
     
-    // Try a simple operation
-    await store.set('test-key', 'test-value');
-    const value = await store.get('test-key');
+    const result = await store.get('test-key');
     
     return {
       statusCode: 200,
@@ -28,20 +28,25 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({
         success: true,
         message: 'Netlify Blobs is working!',
-        testValue: value,
-        siteId: process.env.NETLIFY_SITE_ID || 'Not found'
+        testData: JSON.parse(result),
+        environment: 'Netlify Functions'
       })
     };
-
+    
   } catch (error) {
+    console.error('Blobs error:', error);
+    
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({
         success: false,
         error: error.message,
-        siteId: process.env.NETLIFY_SITE_ID || 'Not found',
-        netlifyEnv: process.env.NETLIFY || 'Not found'
+        details: error.stack,
+        environment: {
+          NETLIFY_SITE_ID: process.env.NETLIFY_SITE_ID || 'Missing',
+          NETLIFY: process.env.NETLIFY || 'Missing'
+        }
       })
     };
   }
