@@ -28,6 +28,12 @@ exports.handler = async (event, context) => {
   try {
     const subscription = JSON.parse(event.body);
     
+    console.log('Subscription request received:', {
+      endpoint: subscription.endpoint?.substring(0, 50) + '...',
+      hasKeys: !!subscription.keys,
+      timestamp: new Date().toISOString()
+    });
+    
     // Validate subscription object
     if (!subscription || !subscription.endpoint) {
       return {
@@ -42,11 +48,13 @@ exports.handler = async (event, context) => {
     let gistId = null;
     
     try {
+      console.log('Looking for existing gist...');
       const existingData = await getSubscriptionsFromGist();
       subscriptions = existingData.subscriptions || [];
       gistId = existingData.gistId;
+      console.log(`Found existing gist with ${subscriptions.length} subscriptions, gistId: ${gistId}`);
     } catch (error) {
-      console.log('No existing subscriptions found, will create new gist');
+      console.log('No existing subscriptions found, will create new gist:', error.message);
     }
     
     // Add new subscription (with simple deduplication by endpoint)
@@ -54,6 +62,7 @@ exports.handler = async (event, context) => {
     
     if (existingIndex >= 0) {
       // Update existing subscription
+      console.log('Updating existing subscription');
       subscriptions[existingIndex] = {
         ...subscription,
         id: subscriptions[existingIndex].id,
@@ -61,18 +70,19 @@ exports.handler = async (event, context) => {
       };
     } else {
       // Add new subscription
+      console.log('Adding new subscription');
       const subscriptionId = Date.now().toString();
       subscription.id = subscriptionId;
       subscription.addedAt = new Date().toISOString();
       subscriptions.push(subscription);
     }
     
-    // Save back to GitHub Gist
-    await saveSubscriptionsToGist(subscriptions, gistId);
+    console.log(`Total subscriptions after update: ${subscriptions.length}`);
     
-    console.log('Subscription saved successfully');
-    console.log('Total subscriptions:', subscriptions.length);
-
+    // Save back to GitHub Gist
+    const gistResult = await saveSubscriptionsToGist(subscriptions, gistId);
+    console.log(`Gist saved successfully: ${gistResult.html_url}`);
+    
     return {
       statusCode: 200,
       headers,
@@ -81,7 +91,8 @@ exports.handler = async (event, context) => {
         subscriptionId: subscription.id,
         totalSubscribers: subscriptions.length,
         message: 'Subscription saved successfully',
-        storage: 'GitHub Gist'
+        storage: 'GitHub Gist',
+        gistUrl: gistResult.html_url
       })
     };
 
@@ -119,14 +130,22 @@ async function getSubscriptionsFromGist() {
   }
 
   const gists = await gistsResponse.json();
-  const deadPoolGist = gists.find(gist => 
-    gist.files['dead-pool-subscriptions.json'] || 
-    gist.description === 'Dead Pool Notification Subscriptions'
-  );
+  console.log(`Found ${gists.length} total gists`);
+  
+  // Look for the subscription gist - be more specific in our search
+  const deadPoolGist = gists.find(gist => {
+    const hasSubscriptionFile = gist.files && gist.files['dead-pool-subscriptions.json'];
+    const hasCorrectDescription = gist.description === 'Dead Pool Notification Subscriptions';
+    console.log(`Checking gist ${gist.id}: hasFile=${!!hasSubscriptionFile}, hasDescription=${hasCorrectDescription}`);
+    return hasSubscriptionFile && hasCorrectDescription;
+  });
 
   if (!deadPoolGist) {
+    console.log('No matching gist found');
     return { subscriptions: [], gistId: null };
   }
+
+  console.log(`Found matching gist: ${deadPoolGist.id}`);
 
   // Get the gist content
   const gistResponse = await fetch(deadPoolGist.url, {
@@ -143,8 +162,11 @@ async function getSubscriptionsFromGist() {
   const gistData = await gistResponse.json();
   const fileContent = gistData.files['dead-pool-subscriptions.json'].content;
   
+  const subscriptions = JSON.parse(fileContent);
+  console.log(`Loaded ${subscriptions.length} subscriptions from gist`);
+  
   return {
-    subscriptions: JSON.parse(fileContent),
+    subscriptions: subscriptions,
     gistId: deadPoolGist.id
   };
 }
@@ -174,6 +196,8 @@ async function saveSubscriptionsToGist(subscriptions, gistId) {
     : 'https://api.github.com/gists';
   
   const method = gistId ? 'PATCH' : 'POST';
+  
+  console.log(`${method} to GitHub API: ${url}`);
 
   const response = await fetch(url, {
     method: method,
@@ -187,8 +211,12 @@ async function saveSubscriptionsToGist(subscriptions, gistId) {
 
   if (!response.ok) {
     const errorText = await response.text();
+    console.error(`GitHub API error: ${response.status} - ${errorText}`);
     throw new Error(`Failed to save to GitHub Gist: ${response.status} - ${errorText}`);
   }
 
-  return await response.json();
+  const result = await response.json();
+  console.log(`Gist ${method === 'POST' ? 'created' : 'updated'} successfully`);
+  
+  return result;
 }
