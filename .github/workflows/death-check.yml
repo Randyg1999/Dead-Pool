@@ -14,5 +14,5 @@ jobs:
     - name: Trigger Death Check
       run: |
         echo "Triggering death check at $(date)"
-        curl -X GET "https://dirty-oar-dead-pool.netlify.app/.netlify/functions/check-deaths"
+        curl -X GET "https://dirty-oar-dead-pool.netlify.app/.netlify/functions/test-trigger"
         echo "Death check completed"
