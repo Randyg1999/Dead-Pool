@@ -1,4 +1,6 @@
-// Function to send push notifications to all subscribers using GitHub Gist storage
+// Function to send push notifications using proper web-push protocol
+
+const webpush = require('web-push');
 
 exports.handler = async (event, context) => {
   const headers = {
@@ -23,6 +25,20 @@ exports.handler = async (event, context) => {
     const { title, body, playerName, celebrityName, dateOfDeath } = JSON.parse(event.body);
     
     console.log('Sending notification:', { title, body, playerName, celebrityName });
+
+    // Configure VAPID details
+    const publicKey = process.env.VAPID_PUBLIC_KEY;
+    const privateKey = process.env.VAPID_PRIVATE_KEY;
+    
+    if (!publicKey || !privateKey) {
+      throw new Error('VAPID keys not configured. Please set VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY environment variables.');
+    }
+
+    webpush.setVapidDetails(
+      'mailto:deadpool@example.com',
+      publicKey,
+      privateKey
+    );
     
     // Get subscriptions from GitHub Gist
     let allSubscriptions = [];
@@ -73,16 +89,17 @@ exports.handler = async (event, context) => {
       ]
     };
 
-    // Send notifications to all subscribers
+    // Send notifications to all subscribers using proper web-push
     let successCount = 0;
     let failureCount = 0;
     
     for (const subscription of allSubscriptions) {
       try {
-        await sendPushNotification(subscription, notificationPayload);
+        await webpush.sendNotification(subscription, JSON.stringify(notificationPayload));
         successCount++;
+        console.log('Push notification sent successfully to:', subscription.endpoint.substring(0, 50) + '...');
       } catch (error) {
-        console.error('Failed to send to subscription:', error);
+        console.error('Failed to send to subscription:', error.message);
         failureCount++;
       }
     }
@@ -167,34 +184,4 @@ async function getSubscriptionsFromGist() {
     subscriptions: JSON.parse(fileContent),
     gistId: deadPoolGist.id
   };
-}
-
-// Send push notification using Web Push Protocol (simplified)
-async function sendPushNotification(subscription, payload) {
-  const notificationData = JSON.stringify(payload);
-  
-  try {
-    // This is a simplified version for testing
-    // In production, you'd use proper VAPID authentication and web-push library
-    const response = await fetch(subscription.endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Encoding': 'aesgcm',
-        'TTL': '86400' // 24 hours
-      },
-      body: notificationData
-    });
-
-    if (!response.ok) {
-      throw new Error(`Push service responded with ${response.status}`);
-    }
-
-    console.log('Push notification sent successfully');
-    return true;
-
-  } catch (error) {
-    console.error('Push notification failed:', error);
-    throw error;
-  }
 }

@@ -1,4 +1,6 @@
-// Return the configured VAPID public key for client-side use
+// Generate proper VAPID keys for production use
+
+const webpush = require('web-push');
 
 exports.handler = async (event, context) => {
   const headers = {
@@ -12,11 +14,15 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const publicKey = process.env.VAPID_PUBLIC_KEY;
-    
-    if (!publicKey) {
-      throw new Error('VAPID public key not configured');
-    }
+    // Generate proper VAPID keys
+    const vapidKeys = webpush.generateVAPIDKeys();
+
+    // Set VAPID details for web-push
+    webpush.setVapidDetails(
+      'mailto:deadpool@example.com', // You can use a real email here
+      vapidKeys.publicKey,
+      vapidKeys.privateKey
+    );
 
     return {
       statusCode: 200,
@@ -27,9 +33,11 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({
         success: true,
         keys: {
-          publicKey: publicKey
+          publicKey: vapidKeys.publicKey,
+          privateKey: vapidKeys.privateKey
         },
-        message: 'VAPID public key for client subscription'
+        message: 'Real VAPID keys generated',
+        instructions: 'Add these to your Netlify environment variables as VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY'
       })
     };
 
@@ -41,7 +49,7 @@ exports.handler = async (event, context) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        error: 'Failed to get VAPID keys',
+        error: 'Failed to generate VAPID keys',
         message: error.message
       })
     };
