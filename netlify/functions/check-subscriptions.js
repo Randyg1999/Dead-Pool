@@ -7,14 +7,12 @@ exports.handler = async (event, context) => {
   };
 
   try {
-    console.log('Environment check:', {
-      NETLIFY_SITE_ID: process.env.NETLIFY_SITE_ID ? 'Present' : 'Missing',
-      NETLIFY: process.env.NETLIFY ? 'Present' : 'Missing',
-      context: context ? 'Present' : 'Missing'
+    // Manual configuration with your site ID
+    const store = getStore('subscriptions', {
+      siteID: '2ca25116-8692-4753-bb94-9248a003f9c2'
+      // token will be auto-provided in Netlify environment
     });
     
-    // This should work automatically in Netlify environment
-    const store = getStore('subscriptions');
     await store.set('test-key', JSON.stringify({ 
       test: true, 
       timestamp: new Date().toISOString() 
@@ -27,26 +25,18 @@ exports.handler = async (event, context) => {
       headers,
       body: JSON.stringify({
         success: true,
-        message: 'Netlify Blobs is working!',
-        testData: JSON.parse(result),
-        environment: 'Netlify Functions'
+        message: 'Netlify Blobs is working with manual config!',
+        testData: JSON.parse(result)
       })
     };
     
   } catch (error) {
-    console.error('Blobs error:', error);
-    
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({
         success: false,
-        error: error.message,
-        details: error.stack,
-        environment: {
-          NETLIFY_SITE_ID: process.env.NETLIFY_SITE_ID || 'Missing',
-          NETLIFY: process.env.NETLIFY || 'Missing'
-        }
+        error: error.message
       })
     };
   }
