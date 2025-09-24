@@ -860,6 +860,12 @@
       
       if (!lastRefresh || (now - lastRefresh) > fiveMinutes) {
         console.log('🔄 PWA focus detected, refreshing data after 5+ minutes...');
+        
+        // Clear existing table contents before refresh
+        document.querySelector('#personTable tbody').innerHTML = '';
+        document.querySelector('#graveyardTable tbody').innerHTML = '';
+        document.querySelector('#summaryTable tbody').innerHTML = '';
+        
         showLoadingOverlay();
         fetchData().finally(() => {
           applyPlayerColors(); // Reapply colors after refresh
