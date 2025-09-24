@@ -89,7 +89,7 @@ const players = [
 	{ playerName: 'Becky', qid: 'Q504455', round: 23 },
 	{ playerName: 'Becky', qid: 'Q537747', round: 24 },
 	{ playerName: 'Becky', qid: 'Q59215', round: 25 },
-	{ playerName: 'Brett', qid: 'Q43274', round: 1 },
+	{ playerName: 'Brett', qid: 'Q2126091', round: 1 },
 	{ playerName: 'Brett', qid: 'Q450675', round: 2 },
 	{ playerName: 'Brett', qid: 'Q355522', round: 3 },
 	{ playerName: 'Brett', qid: 'Q131411648', round: 4 },
