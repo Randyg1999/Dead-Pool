@@ -839,4 +839,40 @@
     // Start trying to initialize
     tryInitialize();
   });
+
+  // Auto-refresh data when PWA becomes visible (for home screen apps)
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      // App became visible, check if we need to refresh data
+      const lastRefresh = localStorage.getItem('deadpool_lastRefresh');
+      const now = Date.now();
+      const fiveMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
+      
+      if (!lastRefresh || (now - lastRefresh) > fiveMinutes) {
+        console.log('🔄 App focus detected, refreshing data after 5+ minutes...');
+        
+        // Clear existing table contents to prevent duplicates
+        const personTableBody = document.querySelector('#personTable tbody');
+        const graveyardTableBody = document.querySelector('#graveyardTable tbody');
+        const summaryTableBody = document.querySelector('#summaryTable tbody');
+        
+        if (personTableBody) personTableBody.innerHTML = '';
+        if (graveyardTableBody) graveyardTableBody.innerHTML = '';
+        if (summaryTableBody) summaryTableBody.innerHTML = '';
+        
+        // Refresh the data
+        showLoadingOverlay();
+        fetchData().finally(() => {
+          // Reapply colors after data refresh
+          if (typeof applyPlayerColors === 'function') {
+            applyPlayerColors();
+          }
+          hideLoadingOverlay();
+        });
+        localStorage.setItem('deadpool_lastRefresh', now.toString());
+      } else {
+        console.log('🔄 App focus detected, but refreshed recently. Skipping.');
+      }
+    }
+  });
 })();
