@@ -9,8 +9,10 @@
 [functions]
   directory = "netlify/functions"
 
-# Death checking is handled by GitHub Actions
-# See .github/workflows/death-check.yml
+# Scheduled functions for death checking
+# Run every 2 hours:
+[functions."check-deaths"]
+  schedule = "0 */2 * * *"
 
 [dev]
   command = "echo 'Static site - no dev server needed'"

@@ -18,16 +18,6 @@
     if (typeof settings !== 'undefined') {
       startDate = new Date(settings.startDate);
       endDate = new Date(settings.endDate);
-      
-      // Update page title and header with current year
-      const year = startDate.getFullYear();
-      const titleText = `The Dirty Oar ${year} Dead Pool`;
-      
-      document.getElementById('page-title').textContent = titleText;
-      document.getElementById('main-title').textContent = titleText;
-      document.getElementById('page-description').setAttribute('content', 
-        `A small hosted app for The Dirty Oar ${year} Dead Pool featuring player standings, a graveyard, and a contestant list.`);
-      
       return true;
     }
     return false;
@@ -848,33 +838,5 @@
     
     // Start trying to initialize
     tryInitialize();
-  });
-
-  // Force refresh when PWA becomes visible (for iOS home screen app)
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) {
-      // App became visible, check if we need to refresh
-      const lastRefresh = localStorage.getItem('lastRefresh');
-      const now = Date.now();
-      const fiveMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
-      
-      if (!lastRefresh || (now - lastRefresh) > fiveMinutes) {
-        console.log('🔄 PWA focus detected, refreshing data after 5+ minutes...');
-        
-        // Clear existing table contents before refresh
-        document.querySelector('#personTable tbody').innerHTML = '';
-        document.querySelector('#graveyardTable tbody').innerHTML = '';
-        document.querySelector('#summaryTable tbody').innerHTML = '';
-        
-        showLoadingOverlay();
-        fetchData().finally(() => {
-          applyPlayerColors(); // Reapply colors after refresh
-          hideLoadingOverlay();
-        });
-        localStorage.setItem('lastRefresh', now.toString());
-      } else {
-        console.log('🔄 PWA focus detected, but refreshed recently. Skipping.');
-      }
-    }
   });
 })();
