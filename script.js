@@ -862,6 +862,7 @@
         console.log('🔄 PWA focus detected, refreshing data after 5+ minutes...');
         showLoadingOverlay();
         fetchData().finally(() => {
+          applyPlayerColors(); // Reapply colors after refresh
           hideLoadingOverlay();
         });
         localStorage.setItem('lastRefresh', now.toString());
