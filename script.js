@@ -204,8 +204,24 @@
   // Data Processing & Table Functions
   // ==========================================================================
 
+  // Clear all table bodies to prevent duplicate entries
+  function clearAllTables() {
+    const personTableBody = document.querySelector('#personTable tbody');
+    const graveyardTableBody = document.querySelector('#graveyardTable tbody');
+    const summaryTableBody = document.querySelector('#summaryTable tbody');
+    
+    if (personTableBody) personTableBody.innerHTML = '';
+    if (graveyardTableBody) graveyardTableBody.innerHTML = '';
+    if (summaryTableBody) summaryTableBody.innerHTML = '';
+    
+    console.log('✅ All tables cleared to prevent duplicates');
+  }
+
   // Process all data: sort, create summary table rows, add table rows, update summaries, and sort graveyard
   function processAllData(allData) {
+    // CRITICAL FIX: Clear all tables FIRST before any processing to prevent duplicates
+    clearAllTables();
+    
     allData.sort((a, b) => {
       if (a.playerName < b.playerName) return -1;
       if (a.playerName > b.playerName) return 1;
@@ -221,7 +237,7 @@
   // Create summary table rows based on unique player names
   function createSummaryTableRows() {
     const summaryTableBody = document.querySelector('#summaryTable tbody');
-    summaryTableBody.innerHTML = ''; // Clear existing rows
+    // Note: table already cleared by clearAllTables(), no need to clear again
     const uniquePlayers = [...new Set(players.map(player => player.playerName))];
     uniquePlayers.forEach(playerName => {
       const row = summaryTableBody.insertRow();
@@ -840,6 +856,46 @@
     tryInitialize();
   });
 
+  // Service Worker Update Detection
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').then((registration) => {
+      console.log('Service Worker registered');
+      
+      // Check for updates every time the page loads
+      registration.update();
+      
+      // Listen for service worker updates
+      registration.addEventListener('updatefound', () => {
+        const newWorker = registration.installing;
+        console.log('New service worker found, installing...');
+        
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            // New service worker is installed and ready
+            console.log('New version available! Showing update prompt...');
+            
+            // Show a notification to the user
+            if (confirm('A new version of Dead Pool is available! Click OK to update now.')) {
+              newWorker.postMessage({ type: 'SKIP_WAITING' });
+              window.location.reload();
+            }
+          }
+        });
+      });
+    }).catch((error) => {
+      console.error('Service Worker registration failed:', error);
+    });
+    
+    // Reload page when new service worker takes control
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!refreshing) {
+        refreshing = true;
+        window.location.reload();
+      }
+    });
+  }
+
   // Auto-refresh data when PWA becomes visible (for home screen apps)
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) {
@@ -851,14 +907,8 @@
       if (!lastRefresh || (now - lastRefresh) > fiveMinutes) {
         console.log('🔄 App focus detected, refreshing data after 5+ minutes...');
         
-        // Clear existing table contents to prevent duplicates
-        const personTableBody = document.querySelector('#personTable tbody');
-        const graveyardTableBody = document.querySelector('#graveyardTable tbody');
-        const summaryTableBody = document.querySelector('#summaryTable tbody');
-        
-        if (personTableBody) personTableBody.innerHTML = '';
-        if (graveyardTableBody) graveyardTableBody.innerHTML = '';
-        if (summaryTableBody) summaryTableBody.innerHTML = '';
+        // Tables will be cleared by processAllData() -> clearAllTables()
+        // No need to clear manually here to avoid race conditions
         
         // Refresh the data
         showLoadingOverlay();
