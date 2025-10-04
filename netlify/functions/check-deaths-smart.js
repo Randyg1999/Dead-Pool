@@ -230,7 +230,7 @@ exports.handler = async (event, context) => {
           const rawDate = entity.claims.P570[0].mainsnak.datavalue.value.time;
           const dateOfDeath = formatDate(rawDate);
           
-          const deathKey = `${player.qid}-${name}`;
+          const deathKey = player.qid;
           
           allDeaths.push({
             name,
