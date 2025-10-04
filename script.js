@@ -295,10 +295,12 @@
         } else {
             // If no "en" or "mul", return the first available language:
             const firstAvailableLang = Object.keys(entity.labels)[0];
-            return entity.labels[firstAvailableLanguage].value;
+            if (firstAvailableLang) {
+                return entity.labels[firstAvailableLang].value;
+            }
         }
     }
-    return 'Label not available';
+    return 'Unknown';
 }
 
 
