@@ -670,9 +670,7 @@
 
     switch (Notification.permission) {
       case 'granted':
-        btnText.textContent = 'Notifications Enabled';
-        btnIcon.textContent = '✅';
-        subscribeBtn.disabled = true;
+        subscribeBtn.style.display = 'none'; // Hide the button
         statusDiv.textContent = 'You\'ll be notified when someone dies!';
         statusDiv.className = 'notify-status success';
         break;
