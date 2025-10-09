@@ -1,6 +1,6 @@
 // Service Worker for Dead Pool Push Notifications
 // VERSION: Update this number whenever you deploy changes!
-const VERSION = '2025.10.03'; // Use date format: YYYY.MM.DD or increment
+const VERSION = '2025.10.09'; // Use date format: YYYY.MM.DD or increment
 const CACHE_NAME = `dead-pool-v${VERSION}`;
 
 const urlsToCache = [
