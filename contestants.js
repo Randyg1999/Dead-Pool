@@ -71,7 +71,7 @@ const players = [
 	{ playerName: 'Becky', qid: 'Q95026', round: 4 },
 	{ playerName: 'Becky', qid: 'Q711921', round: 5 },
 	{ playerName: 'Becky', qid: 'Q22686', round: 6 },
-	{ playerName: 'Becky', qid: 'Q76056222', round: 7 },
+	{ playerName: 'Becky', qid: 'Q3459517', round: 7 },
 	{ playerName: 'Becky', qid: 'Q259998', round: 8 },
 	{ playerName: 'Becky', qid: 'Q456055', round: 9 },
 	{ playerName: 'Becky', qid: 'Q237221', round: 10 },
